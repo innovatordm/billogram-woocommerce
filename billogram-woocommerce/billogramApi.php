@@ -20,6 +20,8 @@ class BillogramApiWrapper {
             $customer
             $customerData = array( // Values for customers
                 'name' => '',
+                'company_type' => 'individual',
+                'org_no' => '',
                 'address' => array(
                     'street_address' => '',
                     'zipcode' => '',
@@ -44,7 +46,7 @@ class BillogramApiWrapper {
                     'url' => ''
                 )
             );
-       
+
     function __construct($apiUser = '', $apiPassword = '') {
         /* 
         Load an instance of the Billogram API library using your API ID and

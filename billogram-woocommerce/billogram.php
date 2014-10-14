@@ -194,7 +194,7 @@ function BillogramWCInit() {
 	/**
  	* Add the Gateway to WooCommerce
  	**/
-	function addBillogramGatewayName($methods) {
+	function addBillogramGateway($methods) {
 		$methods[] = 'BillogramWC';
 		return $methods;
 	}
