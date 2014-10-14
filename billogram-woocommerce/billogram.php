@@ -11,7 +11,7 @@ Author URI: http://innovator.se/
 	License: All rights reserved
 	License URI: http://www.innovator.se
 */
-use billogramApi as Billogram;
+require_once('/billogramApi.php');
 
 add_action('plugins_loaded', 'BillogramWCInit', 0);
 
@@ -91,7 +91,30 @@ function BillogramWCInit() {
 		public function process_payment( $order_id ) {
 
 			$order = wc_get_order( $order_id );
+			$shipping = explode(',', $order->get_shipping_address());
 
+			$bill = new BillogramApiWrapper();
+
+			// Create customer, if it doesn't exist
+			if(!$bill->customerExists($order->billing_email)) {
+				$bill->setOptions(array(
+					'name' => $order->billing_first_name . ' ' . $order->billing_last_name,
+	                'company_type' => 'individual',
+	                'org_no' => '',
+	                'address' => array(
+	                    'street_address' => $shipping[0],
+	                    'zipcode' => $shipping[3],
+	                    'city' => $shipping[2],
+	                    //'country' => $shipping[4]
+	                ),
+	                'contact' => array(
+	                    'email' => $order->billing_email,
+	                    'phone' => $order->billing_phone
+	                )
+				), 'customer');
+				$bill->createCustomer();
+			}	
+			
 			// Mark as on-hold (we're awaiting the manualinvoice)
 			$order->update_status( 'on-hold', __( 'Awaiting invoice approval', 'woocommerce' ) );
 
@@ -99,7 +122,7 @@ function BillogramWCInit() {
 			$order->reduce_order_stock();
 
 			// Remove cart
-			WC()->cart->empty_cart();
+			//WC()->cart->empty_cart();
 
 			// Return thankyou redirect
 			return array(
