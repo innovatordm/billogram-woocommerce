@@ -91,6 +91,13 @@ class BillogramApiWrapper {
         array_push($this->invoiceVal['items'], $item);
     }
 
+    public function updateInvoiceAddress($addr= '', $zip='', $city= '') {
+        $this->invoice->performEvent('update', array(
+            'street_address' => $addr,
+            'zipcode' => $zip,
+            'city' => $city,
+        ));
+    }
     /****************** Shared functions ******************/
 
     /*

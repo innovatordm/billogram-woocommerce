@@ -11,7 +11,7 @@ Author URI: http://innovator.se/
 	License: All rights reserved
 	License URI: http://www.innovator.se
 */
-require_once('/billogramApi.php');
+require_once('billogramApi.php');
 
 add_action('plugins_loaded', 'BillogramWCInit', 0);
 
@@ -128,6 +128,7 @@ function BillogramWCInit() {
 					$item['name']
 				);
 			}
+
 			$current = date("Y-m-d");
 			$due = date("Y-m-d", strtotime("+14 day"));
 			// Key to sign callback
@@ -150,7 +151,13 @@ function BillogramWCInit() {
                 ),
 			), 'invoice');
 			$bill->createInvoice();
-			
+			// Update invoice with woocommerce address
+			$bill->updateInvoiceAddress(
+				$shipping[0], // Street address
+				$shipping[3], // Zip
+				$shipping[2] // City
+			);
+
 			// Mark as on-hold (we're awaiting the manualinvoice)
 			$order->update_status( 'on-hold', __( 'Awaiting invoice approval', 'woocommerce' ) );
 
@@ -169,10 +176,10 @@ function BillogramWCInit() {
 
 		public function billogramCallbacks() {
 			@ob_clean();
-			$callback = ! empty( $_POST ) ? json_decode($_POST) : false;
-
+			$entityBody = file_get_contents('php://input');
+			
 			if($callback) {
-				error_log($callback);
+				mail('kristoffer.bergman@innovator.se', 'Callback test', $callback);
 				wp_die( "Success", "Success", array( 'response' => 200 ) );
 			} else wp_die( "Invalid request", "Billogram WC", array( 'response' => 200 ) );
 		}
