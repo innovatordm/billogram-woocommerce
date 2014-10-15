@@ -34,7 +34,7 @@ function BillogramWCInit() {
 		* Construcy class for plugin defines
 		*
 		*/
-	 	function __construct() {
+	 	public function __construct() {
 		 	$this->id                   = 'billogramwc';
 			$this->has_fields           = true;
 			$this->liveurl              = 'https://www.paypal.com/cgi-bin/webscr';
@@ -56,7 +56,8 @@ function BillogramWCInit() {
 	    	add_action( 'woocommerce_thankyou_billograminvoice', array( $this, 'thankyou_page' ) );
 			// Save settings
 			add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
-		    
+		 	// Payment listener/API hook
+			add_action( 'woocommerce_api_billogramwc', array( $this, 'billogramCallbacks' ) );   
 		}
 		/**
 		* Output for the order received page.
@@ -89,8 +90,9 @@ function BillogramWCInit() {
 	    * @return array
 	    */
 		public function process_payment( $order_id ) {
-
 			$order = wc_get_order( $order_id );
+			//var_dump($order);
+			//die;
 			$shipping = explode(',', $order->get_shipping_address());
 
 			$bill = new BillogramApiWrapper();
@@ -113,7 +115,41 @@ function BillogramWCInit() {
 	                )
 				), 'customer');
 				$bill->createCustomer();
-			}	
+			}
+			// Get customer id from created customer or fetch from billogram if customer aldready exists
+			$customer_no = (null !== $bill->getCustomerField('customer_no')) ? $bill->getCustomerField('customer_no') : $bill->getFirstCustomerByField('contact:email', $order->billing_email)->customer_no;
+			// Add items to invoice
+			$items = $order->get_items();
+			foreach ($items as $item) {
+				$bill->addItem(
+					$item['qty'],
+					($item['line_total'] / $item['qty']),
+					(int) (($item['line_tax'] / $item['line_total'])*100), // Tax
+					$item['name']
+				);
+			}
+			$current = date("Y-m-d");
+			$due = date("Y-m-d", strtotime("+14 day"));
+			// Key to sign callback
+			$key = md5(uniqid("", true) . $order->id);
+			// Generated callback url
+			$callbackUrl = str_replace( 'https:', 'http:', add_query_arg( 'wc-api', 'BillogramWC', home_url( '/' ) ) );
+			// Save sign key to order info
+			update_post_meta($order->id, '_billogram_sign_key', $key);
+
+			$bill->setOptions(array(
+				'invoice_date' => $current,
+				'due_date' => $due,
+				'customer' => array(
+                    'customer_no' => $customer_no, // Must be defined!
+                ),
+                'callbacks' => array(
+                	'sign_key' => $key, // Key to sign callback
+                	'custom' => $order->id, // Associated order id
+                	'url' => $callbackUrl
+                ),
+			), 'invoice');
+			$bill->createInvoice();
 			
 			// Mark as on-hold (we're awaiting the manualinvoice)
 			$order->update_status( 'on-hold', __( 'Awaiting invoice approval', 'woocommerce' ) );
@@ -122,7 +158,7 @@ function BillogramWCInit() {
 			$order->reduce_order_stock();
 
 			// Remove cart
-			//WC()->cart->empty_cart();
+			WC()->cart->empty_cart();
 
 			// Return thankyou redirect
 			return array(
@@ -131,6 +167,15 @@ function BillogramWCInit() {
 			);
 		}
 
+		public function billogramCallbacks() {
+			@ob_clean();
+			$callback = ! empty( $_POST ) ? json_decode($_POST) : false;
+
+			if($callback) {
+				error_log($callback);
+				wp_die( "Success", "Success", array( 'response' => 200 ) );
+			} else wp_die( "Invalid request", "Billogram WC", array( 'response' => 200 ) );
+		}
 
 		/*
 		* Mandatory WC functions

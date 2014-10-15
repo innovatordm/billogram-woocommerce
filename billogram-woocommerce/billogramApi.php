@@ -16,17 +16,21 @@ class BillogramApiWrapper {
       
     private $api,
             $query,
+            $queryVars = array( // Save query vars for other functions to use
+                'field' => '',
+                'value' => '',
+            ),
             $signKey,
             $invoice,
             $customer,
             $customerData = array( // Values for customers
-                'name' => 'Holger Holger',
+                'name' => '',
                 'company_type' => 'individual',
                 'org_no' => '',
                 'address' => array(
-                    'street_address' => 'Skeppsmäklargatan 7',
-                    'zipcode' => '12069',
-                    'city' => 'Stockholm',
+                    'street_address' => '',
+                    'zipcode' => '',
+                    'city' => '',
                     'country' => 'SE'
                 ),
                 'contact' => array(
@@ -35,7 +39,7 @@ class BillogramApiWrapper {
             ),
             $invoiceVal = array(
                 'invoice_date' => '', // Set invoice date to today, by default
-                'due_date' => '2001-01-01',
+                'due_date' => '',
                 'currency' => 'SEK',
                 'customer' => array(
                     'customer_no' => '', // Must be defined!
@@ -67,6 +71,8 @@ class BillogramApiWrapper {
     * Attempts to create an invoice at billogram 
     */
     public function createInvoice() {
+        /* var_dump($this->invoiceVal);
+        die; */
         $this->invoice = $this->api->billogram->create($this->invoiceVal);
     }
     
@@ -74,7 +80,7 @@ class BillogramApiWrapper {
     * Adds an item to the invoice data
     * Define invoice data locally before creating the invoice
     */
-    public function addItem($item = 1, $price = 0, $vat = 25, $title = 'Not defined') {
+    public function addItem($count = 1, $price = 0, $vat = 25, $title = 'Not defined') {
         $item = array(
             'count' => $count,
             'price' => $price,
@@ -82,7 +88,7 @@ class BillogramApiWrapper {
             'title' => $title,
         );
         // Push item to invoice array
-        array_push($this->invoice->items, $item);
+        array_push($this->invoiceVal['items'], $item);
     }
 
     /****************** Shared functions ******************/
@@ -117,13 +123,42 @@ class BillogramApiWrapper {
         $this->customer = $this->api->customers->create($this->customerData);
     }
     /*
+    * Returns the specified customer field
+    */
+    public function getCustomerField($field='')
+    {
+        if($field !== '')
+            return $this->customer->$field;
+        throw new Exception("Field must not be empty!", 1);   
+    }
+    /*
+    * Gets the first existing customer by the specified field and value
+    * If a query already has been defined, it will use those values
+    */
+    public function getFirstCustomerByField($field='', $value= '')
+    {
+        if($field !== '' && $value !== '') {
+            // Setup query if not already defined with the specified values
+            if($this->queryVars['field'] !== $field && $this->queryVars['value']) {
+                $this->query = $this->api->customers->query()->
+                filterField($field, $value);
+            }
+            // fetch results and return first result
+            $result = $this->query->getPage(1);
+            return $result[0];
+        } else throw new Exception("Both field and value must be defined!", 1);   
+    }
+    /*
     * Checks if customer exists based on the specified value
     *
     */
     public function customerExists($value='', $field = 'contact:email') {
         if($email !== '') {
             $this->query = $this->api->customers->query()->makeFilter('field', $field, $value);
-            
+            // Set query vars for later use, by other functions in the class
+            $this->queryVars['field'] = $field;
+            $this->queryVars['value'] = $value;
+            // Query billogram for result count
             if($this->query->count() > 0)
                 return true;
             return false;
