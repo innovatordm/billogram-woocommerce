@@ -191,12 +191,15 @@ function BillogramWCInit() {
 		}
 
 		public function billogramCallbacks() {
-			@ob_clean();
-			$entityBody = file_get_contents('php://input');
+			$entityBody = json_decode(file_get_contents('php://input'));
 			
-			if($entityBody) {
+			if(is_nan($entityBody->custom))
+				wp_die( "Invalid request", "Billogram WC", array( 'response' => 200 ) );
+			
+			$check = md5($entityBody->callback_id . get_post_meta($entityBody->custom, '_billogram_sign_key', true));
+			if($check === $entityBody->signature) {
 				error_log(print_r($entityBody, true));
-				wp_die( "Success", "Success", array( 'response' => 200 ) );
+				wp_die( "Success", "Billogram WC", array( 'response' => 200 ) );
 			} else wp_die( "Invalid request", "Billogram WC", array( 'response' => 200 ) );
 		}
 
