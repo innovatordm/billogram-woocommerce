@@ -244,7 +244,8 @@ function BillogramWCInit() {
 				'api_details' => array(
 					'title'       => __( 'API Credentials', 'woocommerce' ),
 					'type'        => 'title',
-					'description' => sprintf( __( 'Enter your Billogram API credentials. Learn how to access your Billogram API Credentials %shere%s.', 'woocommerce' ), '<a href="https://developer.paypal.com/webapps/developer/docs/classic/api/apiCredentials/#creating-classic-api-credentials">', '</a>' ),
+					'description' => sprintf( __( 'Som inloggad väljer du först inställningar högst upp till höger, scrolla ned till sektionen API och skapa en API-nyckel. %sLänk till billogram inställningar%s.', 'woocommerce' ), 
+						'<a href="https://billogram.com/settings">', '</a>' ),
 				),
 				'api_username' => array(
 					'title'       => __( 'API Username', 'woocommerce' ),
