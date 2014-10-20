@@ -55,10 +55,9 @@ class BillogramApiWrapper {
     function __construct($apiUser = '', $apiPassword = '',  $apiBaseUrl = 'https://billogram.com/api/v2') {
         /* 
         Load an instance of the Billogram API library using your API ID and
-        API password. You can also pass an app identifier for better debugging.
-        For testing you will most likely also use another API base url. 
+        API password. You can also pass an app identifier for better debugging. 
        */
-        $identifier = 'Innovator test instance';
+        $identifier = 'Billogram';
         $this->api = new BillogramAPI($apiUser, $apiPassword, $identifier, $apiBaseUrl);
     }
 
@@ -87,7 +86,9 @@ class BillogramApiWrapper {
         // Push item to invoice array
         array_push($this->invoiceVal['items'], $item);
     }
-
+    /*
+    * Updates the invoice information at billogram
+    */
     public function updateInvoiceAddress($addr= '', $zip='', $city= '') {
         //$this->invoice->refresh();
         $return = $this->invoice->update(
@@ -101,7 +102,7 @@ class BillogramApiWrapper {
                 )
             )
         );
-        var_dump($this->invoice->id);
+        //var_dump($this->invoice->id);
         return $return;
     }
     /****************** Shared functions ******************/

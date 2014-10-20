@@ -93,8 +93,11 @@ function BillogramWCInit() {
 	    */
 		public function process_payment( $order_id ) {
 			$order = wc_get_order( $order_id );
-			//var_dump($order->billing_last_name);
-			//die;
+			/*
+			var_dump(get_post_meta($order->id));
+			var_dump($order->get_shipping_method());
+			die; 
+			*/
 			$shipping = explode(',', $order->get_shipping_address());
 
 			$bill = new BillogramApiWrapper(
@@ -134,6 +137,13 @@ function BillogramWCInit() {
 					$item['name']
 				);
 			}
+			// Add shipping cost
+			$bill->addItem(
+				1,
+				$order->order_shipping,
+				25,
+				$order->get_shipping_method()
+			);
 
 			$current = date("Y-m-d");
 			$due = date("Y-m-d", strtotime("+14 day"));
@@ -157,16 +167,13 @@ function BillogramWCInit() {
                 ),
 			), 'invoice');
 			$bill->createInvoice();
+			
 			// Update invoice with woocommerce address
 			$thing = $bill->updateInvoiceAddress(
 				$order->shipping_address_1, // Street address
 				$order->shipping_postcode, // Zip
 				$order->shipping_city // City
 			);
-			echo "<pre>";
-			var_dump($thing);
-			echo "</pre>";
-			die;
 			// Mark as on-hold (we're awaiting the manualinvoice)
 			$order->update_status( 'on-hold', __( 'Awaiting invoice approval', 'woocommerce' ) );
 
