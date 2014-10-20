@@ -52,17 +52,14 @@ class BillogramApiWrapper {
                 )
             );
 
-    function __construct($apiUser = '', $apiPassword = '') {
+    function __construct($apiUser = '', $apiPassword = '',  $apiBaseUrl = 'https://billogram.com/api/v2') {
         /* 
         Load an instance of the Billogram API library using your API ID and
         API password. You can also pass an app identifier for better debugging.
         For testing you will most likely also use another API base url. 
        */
-        $apiId = '1862-gWAS*wsU';
-        $apiPassword = '460899fa73bd1c65898d379b12f3e61b';
         $identifier = 'Innovator test instance';
-        $apiBaseUrl = 'https://sandbox.billogram.com/api/v2';
-        $this->api = new BillogramAPI($apiId, $apiPassword, $identifier, $apiBaseUrl);
+        $this->api = new BillogramAPI($apiUser, $apiPassword, $identifier, $apiBaseUrl);
     }
 
     /****************** Invoice related functions ******************/

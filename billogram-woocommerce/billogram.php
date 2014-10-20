@@ -37,21 +37,23 @@ function BillogramWCInit() {
 	 	public function __construct() {
 		 	$this->id                   = 'billogramwc';
 			$this->has_fields           = true;
-			$this->liveurl              = 'https://www.paypal.com/cgi-bin/webscr';
-			$this->testurl              = 'https://www.sandbox.paypal.com/cgi-bin/webscr';
+			$this->liveurl              = 'https://billogram.com/api/v2';
+			$this->testurl              = 'https://sandbox.billogram.com/api/v2';
 			$this->method_title         = __( 'Billogram', 'woocommerce' );
-			$this->method_description   = __( 'Pay by invoice, using Billogram.', 'woocommerce' );
+			$this->method_description   = __( 'Ta betalt med faktura, via Billogram.', 'woocommerce' );
 			
 			// Plugin settings defines
 			$this->init_form_fields();
 			$this->init_settings(); // Init settings for usage
 
-			/* Define user set settings here */
 			// Define user set variables
 			$this->title        = $this->get_option( 'title' );
 			$this->description  = $this->get_option( 'description' );
 			$this->instructions = $this->get_option( 'instructions', $this->description );
-
+			$this->testMode		= $this->get_option( 'testmode' );
+			$this->apiUrl		= ($this->testMode === 'yes') ? $this->testurl : $this->liveurl;
+			$this->apiUser 		= $this->get_option( 'api_username' );
+			$this->apiPassword 	= $this->get_option( 'api_password' );
 			// Actions
 	    	add_action( 'woocommerce_thankyou_billograminvoice', array( $this, 'thankyou_page' ) );
 			// Save settings
@@ -95,7 +97,11 @@ function BillogramWCInit() {
 			//die;
 			$shipping = explode(',', $order->get_shipping_address());
 
-			$bill = new BillogramApiWrapper();
+			$bill = new BillogramApiWrapper(
+				$this->apiUser,
+				$this->apiPassword,
+				$this->apiUrl
+			);
 
 			// Create customer, if it doesn't exist
 			if(!$bill->customerExists($order->billing_email)) {
@@ -195,15 +201,15 @@ function BillogramWCInit() {
 		public function init_form_fields() {
 			$this->form_fields = array(
 				'enabled' => array(
-					'title'   => __( 'Enable/Disable', 'woocommerce' ),
+					'title'   => __( 'Aktivera/Avaktivera', 'woocommerce' ),
 					'type'    => 'checkbox',
-					'label'   => __( 'Enable Billogram', 'woocommerce' ),
+					'label'   => __( 'Aktivera Billogram', 'woocommerce' ),
 					'default' => 'yes'
 				),
 				'title' => array(
-					'title'       => __( 'Title', 'woocommerce' ),
+					'title'       => __( 'Titel', 'woocommerce' ),
 					'type'        => 'text',
-					'description' => __( 'This controls the title which the user sees during checkout.', 'woocommerce' ),
+					'description' => __( 'Skriv den titel du vill visa vid kassan.', 'woocommerce' ),
 					'default'     => __( 'Billogram', 'woocommerce' ),
 					'desc_tip'    => true,
 				),
@@ -211,60 +217,60 @@ function BillogramWCInit() {
 					'title'       => __( 'Description', 'woocommerce' ),
 					'type'        => 'text',
 					'desc_tip'    => true,
-					'description' => __( 'This controls the description which the user sees during checkout.', 'woocommerce' ),
-					'default'     => __( 'Pay via invoice; invoices man!', 'woocommerce' )
+					'description' => __( 'Skriv den beskrivning du vill visa vid kassan.', 'woocommerce' ),
+					'default'     => __( 'Betala via faktura', 'woocommerce' )
 				),
 				'testmode' => array(
 					'title'       => __( 'Billogram sandbox', 'woocommerce' ),
 					'type'        => 'checkbox',
-					'label'       => __( 'Enable Billogram sandbox', 'woocommerce' ),
+					'label'       => __( 'Aktivera Billogram test miljö', 'woocommerce' ),
 					'default'     => 'no',
-					'description' => sprintf( __( 'Billogram sandbox can be used to test payments. Sign up for a developer account <a href="%s">here</a>.', 'woocommerce' ), 'https://developer.paypal.com/' ),
-				),
+					'description' => sprintf( __( 'Testa billogram i test miljön, du måste registrera ett utvecklarkonto hos billogram för detta. Mer information <a href="%s">här</a>.', 'woocommerce' ), 'https://billogram.com/api' ),
+				), /*
 				'debug' => array(
 					'title'       => __( 'Debug Log', 'woocommerce' ),
 					'type'        => 'checkbox',
 					'label'       => __( 'Enable logging', 'woocommerce' ),
 					'default'     => 'no',
-					'description' => sprintf( __( 'Log Billogram events, such as IPN requests, inside <code>%s</code>', 'woocommerce' ), wc_get_log_file_path( 'paypal' ) )
-				),
+					'description' => sprintf( __( 'Log Billogram events, such as IPN requests, inside <code>%s</code>', 'woocommerce' ), wc_get_log_file_path( 'billogram' ) )
+				), */
 				'advanced' => array(
-					'title'       => __( 'Advanced options', 'woocommerce' ),
+					'title'       => __( 'Faktura inställningar', 'woocommerce' ),
 					'type'        => 'title',
 					'description' => '',
 				),
 				'paymentaction' => array(
-					'title'       => __( 'Payment Action', 'woocommerce' ),
+					'title'       => __( 'Godkänn och skicka fakturor', 'woocommerce' ),
 					'type'        => 'select',
-					'description' => __( 'Choose whether you wish to allow invoicces immediately or authorize them manually.', 'woocommerce' ),
-					'default'     => 'sale',
+					'description' => __( 'Välj om du vill skicka fakturor automatiskt, eller om du vill godkänna dom först.', 'woocommerce' ),
+					'default'     => 'authorize',
 					'desc_tip'    => true,
 					'options'     => array(
-						'allow'          => __( 'Allow', 'woocommerce' ),
-						'authorize' => __( 'Authorize', 'woocommerce' )
+						'allow'          => __( 'Godkänn och skicka automatiskt', 'woocommerce' ),
+						'authorize' => __( 'Godkänn och skicka manuellt', 'woocommerce' )
 					)
 				),
 				'api_details' => array(
-					'title'       => __( 'API Credentials', 'woocommerce' ),
+					'title'       => __( 'API iställningar', 'woocommerce' ),
 					'type'        => 'title',
-					'description' => sprintf( __( 'Som inloggad väljer du först inställningar högst upp till höger, scrolla ned till sektionen API och skapa en API-nyckel. %sLänk till billogram inställningar%s.', 'woocommerce' ), 
+					'description' => sprintf( __( 'För att hitta dina API detaljer väljer du som inloggad först inställningar högst upp till höger, scrolla ned till sektionen API och skapa en API-nyckel. %sLänk till billogram inställningar%s.', 'woocommerce' ), 
 						'<a href="https://billogram.com/settings">', '</a>' ),
 				),
 				'api_username' => array(
 					'title'       => __( 'API Username', 'woocommerce' ),
 					'type'        => 'text',
-					'description' => __( 'Get your API credentials from Billogram.', 'woocommerce' ),
+					'description' => __( 'Ditt API användarnamn från Billogram.', 'woocommerce' ),
 					'default'     => '',
 					'desc_tip'    => true,
-					'placeholder' => __( 'Optional', 'woocommerce' )
+					'placeholder' => __( 'Du måste fylla i detta fält', 'woocommerce' )
 				),
 				'api_password' => array(
 					'title'       => __( 'API Password', 'woocommerce' ),
 					'type'        => 'text',
-					'description' => __( 'Get your API credentials from Billogram.', 'woocommerce' ),
+					'description' => __( 'Ditt API lösenord från Billogram.', 'woocommerce' ),
 					'default'     => '',
 					'desc_tip'    => true,
-					'placeholder' => __( 'Optional', 'woocommerce' )
+					'placeholder' => __( 'Du måste fylla i detta fält', 'woocommerce' )
 				)
 			);
 		}
