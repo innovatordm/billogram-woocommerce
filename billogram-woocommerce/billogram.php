@@ -91,7 +91,7 @@ function BillogramWCInit() {
 	    */
 		public function process_payment( $order_id ) {
 			$order = wc_get_order( $order_id );
-			//var_dump($order);
+			//var_dump($order->billing_last_name);
 			//die;
 			$shipping = explode(',', $order->get_shipping_address());
 
@@ -104,10 +104,10 @@ function BillogramWCInit() {
 	                'company_type' => 'individual',
 	                'org_no' => '',
 	                'address' => array(
-	                    'street_address' => $shipping[0],
-	                    'zipcode' => $shipping[3],
-	                    'city' => $shipping[2],
-	                    //'country' => $shipping[4]
+	                    'street_address' => $order->billing_address_1,
+	                    'zipcode' => $order->billing_postcode,
+	                    'city' => $order->billing_city,
+	                    //'country' => $order->billing_country
 	                ),
 	                'contact' => array(
 	                    'email' => $order->billing_email,
@@ -152,12 +152,15 @@ function BillogramWCInit() {
 			), 'invoice');
 			$bill->createInvoice();
 			// Update invoice with woocommerce address
-			$bill->updateInvoiceAddress(
-				$shipping[0], // Street address
-				$shipping[3], // Zip
-				$shipping[2] // City
+			$thing = $bill->updateInvoiceAddress(
+				$order->shipping_address_1, // Street address
+				$order->shipping_postcode, // Zip
+				$order->shipping_city // City
 			);
-
+			echo "<pre>";
+			var_dump($thing);
+			echo "</pre>";
+			die;
 			// Mark as on-hold (we're awaiting the manualinvoice)
 			$order->update_status( 'on-hold', __( 'Awaiting invoice approval', 'woocommerce' ) );
 
@@ -178,8 +181,8 @@ function BillogramWCInit() {
 			@ob_clean();
 			$entityBody = file_get_contents('php://input');
 			
-			if($callback) {
-				mail('kristoffer.bergman@innovator.se', 'Callback test', $callback);
+			if($entityBody) {
+				error_log(print_r($entityBody, true));
 				wp_die( "Success", "Success", array( 'response' => 200 ) );
 			} else wp_die( "Invalid request", "Billogram WC", array( 'response' => 200 ) );
 		}
