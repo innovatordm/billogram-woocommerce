@@ -57,7 +57,7 @@ class BillogramApiWrapper {
         Load an instance of the Billogram API library using your API ID and
         API password. You can also pass an app identifier for better debugging. 
        */
-        $identifier = 'Billogram';
+        $identifier = 'Billogram-woocommerce';
         $this->api = new BillogramAPI($apiUser, $apiPassword, $identifier, $apiBaseUrl);
     }
 
@@ -71,7 +71,18 @@ class BillogramApiWrapper {
         die; */
         $this->invoice = $this->api->billogram->create($this->invoiceVal);
     }
-    
+    /* 
+    * Tries to fetch an existing invoice from Billogram
+    */
+    public function getInvoice($id) {
+        $this->invoice = $this->api->billogram->get($id);
+    }
+    /*
+    * Returns the specified value from the invoice object
+    */
+    public function getInvoiceValue($key) {
+        return $this->invoice->$key;
+    }
     /*
     * Adds an item to the invoice data
     * Define invoice data locally before creating the invoice

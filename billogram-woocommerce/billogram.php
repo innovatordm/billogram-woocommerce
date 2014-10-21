@@ -11,7 +11,16 @@ Author URI: http://innovator.se/
 	License: All rights reserved
 	License URI: http://www.innovator.se
 */
-require_once('billogramApi.php');
+$requires = array(
+	'billogramApi.php',
+	'billogramUi.php',
+	'billogramAjax.php'
+);
+
+foreach ($requires as $require) {
+	require_once($require);
+}
+
 
 add_action('plugins_loaded', 'BillogramWCInit', 0);
 
@@ -98,8 +107,7 @@ function BillogramWCInit() {
 			var_dump($order->get_shipping_method());
 			die; 
 			*/
-			$shipping = explode(',', $order->get_shipping_address());
-
+			
 			$bill = new BillogramApiWrapper(
 				$this->apiUser,
 				$this->apiPassword,
@@ -144,7 +152,7 @@ function BillogramWCInit() {
 				25,
 				$order->get_shipping_method()
 			);
-
+			
 			$current = date("Y-m-d");
 			$due = date("Y-m-d", strtotime("+14 day"));
 			// Key to sign callback
@@ -163,11 +171,12 @@ function BillogramWCInit() {
                 'callbacks' => array(
                 	'sign_key' => $key, // Key to sign callback
                 	'custom' => $order->id, // Associated order id
-                	'url' => $callbackUrl
+                	'url' => 'http://kristoffer.wpengine.com/?wc-api=BillogramWC'
                 ),
 			), 'invoice');
 			$bill->createInvoice();
-			
+			// Save invoice id to order
+			update_post_meta($order->id, '_billogram_id', $bill->getInvoiceValue('id'));
 			// Update invoice with woocommerce address
 			$thing = $bill->updateInvoiceAddress(
 				$order->shipping_address_1, // Street address
