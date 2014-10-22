@@ -116,6 +116,13 @@ class BillogramApiWrapper {
         //var_dump($this->invoice->id);
         return $return;
     }
+    /*
+    *
+    */
+    public function send()
+    {
+        $this->invoice->send('Email');
+    }
     /****************** Shared functions ******************/
 
     /*

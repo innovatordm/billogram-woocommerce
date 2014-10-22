@@ -26,12 +26,16 @@ class BillogramAjax {
 	}
 
 	public function sendInvoice() {
+			$post = get_post(intval($_POST['orderId']));
+			$gateway = get_post_meta($post->ID, '_payment_method', true);
 		try {
-			$postId = get_post_meta(intval($_POST['orderId']), '_billogram_id', true);
-			$this->api->getInvoice($postId);
-			echo $this->api->getInvoiceValue('id');
+			if($post->post_status === 'wc-on-hold' && $gateway === 'billogramwc') {
+				$invoiceId = get_post_meta($post->ID, '_billogram_id', true);
+				$this->api->getInvoice($invoiceId);
+				echo $this->api->send();
+			}
 		} catch (Exception $e) {
-			echo "Something went wrong.";
+			echo "Something went wrong. " . $e;
 		}
 		die;
 	}
