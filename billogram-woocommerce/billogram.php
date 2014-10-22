@@ -171,7 +171,7 @@ function BillogramWCInit() {
                 'callbacks' => array(
                 	'sign_key' => $key, // Key to sign callback
                 	'custom' => $order->id, // Associated order id
-                	'url' => 'http://kristoffer.wpengine.com/?wc-api=BillogramWC'
+                	'url' => $callbackUrl
                 ),
 			), 'invoice');
 			$bill->createInvoice();

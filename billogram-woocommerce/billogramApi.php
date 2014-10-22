@@ -70,6 +70,7 @@ class BillogramApiWrapper {
         /* var_dump($this->invoiceVal);
         die; */
         $this->invoice = $this->api->billogram->create($this->invoiceVal);
+        //file_put_contents('create.txt', print_r($this->invoice, true));
     }
     /* 
     * Tries to fetch an existing invoice from Billogram
@@ -114,6 +115,7 @@ class BillogramApiWrapper {
             )
         );
         //var_dump($this->invoice->id);
+        //file_put_contents('response.txt', print_r($return, true));
         return $return;
     }
     /*
