@@ -50,6 +50,8 @@ function BillogramWCInit() {
 			$this->testurl              = 'https://sandbox.billogram.com/api/v2';
 			$this->method_title         = __( 'Billogram', 'woocommerce' );
 			$this->method_description   = __( 'Ta betalt med faktura, via Billogram.', 'woocommerce' );
+			// Declare support for subscriptions
+			$this->supports = array( 'subscriptions', 'products' );
 			
 			// Plugin settings defines
 			$this->init_form_fields();
@@ -69,6 +71,7 @@ function BillogramWCInit() {
 			add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
 		 	// Payment listener/API hook
 			add_action( 'woocommerce_api_billogramwc', array( $this, 'billogramCallbacks' ) );   
+			//add_action( 'scheduled_subscription_payment_billogramwc', array( $this, 'processSubscription' ) );   
 		}
 		/**
 		* Output for the order received page.
@@ -184,9 +187,16 @@ function BillogramWCInit() {
 				$order->shipping_postcode, // Zip
 				$order->shipping_city // City
 			);
-			// Mark as on-hold (we're awaiting the manualinvoice)
-			$order->update_status( 'on-hold', __( 'Awaiting invoice approval', 'woocommerce' ) );
-
+			// Mark as on-hold (we're awaiting the manual invoice)
+			
+			if(class_exists( 'WC_Subscriptions_Order' ) ) {
+				if (!WC_Subscriptions_Order::order_contains_subscription( $order->id ) ) {
+					$order->update_status( 'on-hold', __( 'Awaiting invoice approval', 'woocommerce' ) );
+				}
+			} else {
+				$order->update_status( 'on-hold', __( 'Awaiting invoice approval', 'woocommerce' ) );
+			}
+			
 			// Reduce stock levels
 			$order->reduce_order_stock();
 
@@ -198,6 +208,10 @@ function BillogramWCInit() {
 				'result' 	=> 'success',
 				'redirect'	=> $this->get_return_url( $order )
 			);
+		}
+
+		public function processSubscription($amount_to_charge, $order, $product_id) {
+			echo "horse";
 		}
 
 		public function billogramCallbacks() {
@@ -242,6 +256,7 @@ function BillogramWCInit() {
 					case 'BillogramEnded':
 						// Completed payment with invoice id
 						$order->payment_complete($entityBody->billogram->id);
+						//WC_Subscriptions_Manager::process_subscription_payments_on_order( $entityBody->billogram->id, $product_id = '' );
 						$order->add_order_note(__( 'Hela fakturabeloppet har blivit betalt.', 'woocommerce' ));
 					break;
 					
