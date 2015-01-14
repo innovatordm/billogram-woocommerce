@@ -123,7 +123,7 @@ class BillogramApiWrapper {
     */
     public function send()
     {
-        $this->invoice->send('Email');
+        return $this->invoice->send('Email');
     }
     /****************** Shared functions ******************/
 

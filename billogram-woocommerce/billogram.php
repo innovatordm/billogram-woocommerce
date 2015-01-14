@@ -7,7 +7,7 @@ Version: 0.1
 Author: Innovator Digital Markets AB
 Author URI: http://innovator.se/
 
-	Copyright: Â© 2014-2014 Innovator Digital Markets AB.
+	Copyright: Â© 2014-2015 Innovator Digital Markets AB.
 	License: All rights reserved
 	License URI: http://www.innovator.se
 */

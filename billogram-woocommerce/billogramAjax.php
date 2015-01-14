@@ -32,10 +32,11 @@ class BillogramAjax {
 			if($post->post_status === 'wc-on-hold' && $gateway === 'billogramwc') {
 				$invoiceId = get_post_meta($post->ID, '_billogram_id', true);
 				$this->api->getInvoice($invoiceId);
-				echo $this->api->send();
+				$this->api->send();
+				echo "Fakturan skickad";
 			}
 		} catch (Exception $e) {
-			echo "Something went wrong. " . $e;
+			echo "Något gick fel, fakturan har inte skickats!";
 		}
 		die;
 	}
