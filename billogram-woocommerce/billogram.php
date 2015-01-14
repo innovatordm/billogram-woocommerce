@@ -177,6 +177,7 @@ function BillogramWCInit() {
 			$bill->createInvoice();
 			// Save invoice id to order
 			update_post_meta($order->id, '_billogram_id', $bill->getInvoiceValue('id'));
+			update_post_meta($order->id, '_billogram_status', 'Unattested');
 			// Update invoice with woocommerce address
 			$thing = $bill->updateInvoiceAddress(
 				$order->shipping_address_1, // Street address
@@ -207,7 +208,47 @@ function BillogramWCInit() {
 			
 			$check = md5($entityBody->callback_id . get_post_meta($entityBody->custom, '_billogram_sign_key', true));
 			if($check === $entityBody->signature) {
-				error_log(print_r($entityBody, true));
+				// error_log(print_r($entityBody, true));
+
+				$order = wc_get_order( $entityBody->custom );
+
+				switch ($entityBody->event->type) {
+					case 'BillogramSent':
+						$order->update_status( 'pending', __( 'Faktura har skickats, inväntar betalning.<br>', 'woocommerce' ) );
+						update_post_meta($order->id, '_billogram_status', $entityBody->billogram->state);
+					break;
+					
+					case 'Payment':
+						// Was payment manually entered by seller?
+						if($entityBody->event->data->manual) { // Yes
+							$order->add_order_note( 
+								sprintf(
+									__( 'Manuell betalning från kund, angiven av säljare.<br>Belopp: %d kr.<br>%d kr kvarstår.', 'woocommerce' ), 
+									$entityBody->event->data->amount, 
+									$entityBody->event->data->remaining_sum
+								), 
+							0);
+						} else { // No
+							$order->add_order_note( 
+								sprintf(
+									__( 'Betalning från kund.<br>Belopp: %d kr. <br>%d kr kvarstår.', 'woocommerce' ), 
+									$entityBody->event->data->amount, 
+									$entityBody->event->data->remaining_sum
+								), 
+							0);
+						}
+					break;
+
+					case 'BillogramEnded':
+						// Completed payment with invoice id
+						$order->payment_complete($entityBody->billogram->id);
+						$order->add_order_note(__( 'Hela fakturabeloppet har blivit betalt.', 'woocommerce' ));
+					break;
+					
+					default:
+						# code...
+					break;
+				}
 				wp_die( "Success", "Billogram WC", array( 'response' => 200 ) );
 			} else wp_die( "Invalid request", "Billogram WC", array( 'response' => 200 ) );
 		}
