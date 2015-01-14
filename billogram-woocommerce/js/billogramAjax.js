@@ -1,7 +1,8 @@
 jQuery(document).ready(function($) {
 	var data = {
 		'action': 'send_invoice',
-		'orderId': billogramData.orderId
+		'orderId': billogramData.orderId,
+		'BillSec': billogramData.nonce
 	};
 	$('#sendInvoice').click(function(e) {
 		e.preventDefault();

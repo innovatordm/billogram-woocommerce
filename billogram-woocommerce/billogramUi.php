@@ -39,7 +39,7 @@
 
 			// in JavaScript, object properties are accessed as ajax_object.ajax_url, ajax_object.we_value
 			wp_localize_script( 'billogram-ajax', 'billogramData',
-            array( 'ajaxUrl' => admin_url( 'admin-ajax.php' ), 'orderId' => $post->ID) );
+            array( 'ajaxUrl' => admin_url( 'admin-ajax.php' ), 'orderId' => $post->ID, 'nonce' => wp_create_nonce( "innovBilloNonce" ) ) );
 		}
 	}
 ?>

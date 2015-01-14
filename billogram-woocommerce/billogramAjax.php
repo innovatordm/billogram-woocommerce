@@ -26,8 +26,12 @@ class BillogramAjax {
 	}
 
 	public function sendInvoice() {
-			$post = get_post(intval($_POST['orderId']));
-			$gateway = get_post_meta($post->ID, '_payment_method', true);
+		// Check nonce, if invalid die
+		check_ajax_referer( "innovBilloNonce", "BillSec", true );
+		
+		$post = get_post(intval($_POST['orderId']));
+		$gateway = get_post_meta($post->ID, '_payment_method', true);
+
 		try {
 			if($post->post_status === 'wc-on-hold' && $gateway === 'billogramwc') {
 				$invoiceId = get_post_meta($post->ID, '_billogram_id', true);
@@ -38,7 +42,7 @@ class BillogramAjax {
 		} catch (Exception $e) {
 			echo "Något gick fel, fakturan har inte skickats!";
 		}
-		die;
+		wp_die();
 	}
 }
 
