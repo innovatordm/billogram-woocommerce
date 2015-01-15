@@ -221,8 +221,8 @@ function BillogramWCInit() {
 		}
 
 		public function processSubscription($amount_to_charge, $order, $product_id = '') {
-			//WC_Subscriptions_Manager::process_subscription_payments_on_order( $order);
-			$order->payment_complete();
+			WC_Subscriptions_Manager::process_subscription_payments_on_order( $order, $product_id);
+			//$order->payment_complete();
 			error_log("Process subscription " . $amount_to_charge . " " . $order->id . " " . $product_id );
 		}
 
