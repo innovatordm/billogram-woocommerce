@@ -51,7 +51,13 @@ function BillogramWCInit() {
 			$this->method_title         = __( 'Billogram', 'woocommerce' );
 			$this->method_description   = __( 'Ta betalt med faktura, via Billogram.', 'woocommerce' );
 			// Declare support for subscriptions
-			$this->supports = array( 'subscriptions', 'products' );
+			$this->supports = array( 
+				'subscriptions', 
+				'products', 
+				'subscription_cancellation', 
+               	'subscription_suspension', 
+               	'subscription_reactivation', 
+            );
 			
 			// Plugin settings defines
 			$this->init_form_fields();
@@ -71,7 +77,7 @@ function BillogramWCInit() {
 			add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
 		 	// Payment listener/API hook
 			add_action( 'woocommerce_api_billogramwc', array( $this, 'billogramCallbacks' ) );   
-			//add_action( 'scheduled_subscription_payment_billogramwc', array( $this, 'processSubscription' ) );   
+			add_action( 'scheduled_subscription_payment_billogramwc', array( $this, 'processSubscription' ), 10, 3 );   
 		}
 		/**
 		* Output for the order received page.
@@ -136,8 +142,12 @@ function BillogramWCInit() {
 				), 'customer');
 				$bill->createCustomer();
 			}
+			
 			// Get customer id from created customer or fetch from billogram if customer aldready exists
-			$customer_no = (null !== $bill->getCustomerField('customer_no')) ? $bill->getCustomerField('customer_no') : $bill->getFirstCustomerByField('contact:email', $order->billing_email)->customer_no;
+			$customer_no = (null !== $bill->getCustomerField('customer_no')) ? 
+				$bill->getCustomerField('customer_no') : 
+				$bill->getFirstCustomerByField('contact:email', $order->billing_email)->customer_no;
+			
 			// Add items to invoice
 			$items = $order->get_items();
 			foreach ($items as $item) {
@@ -210,8 +220,10 @@ function BillogramWCInit() {
 			);
 		}
 
-		public function processSubscription($amount_to_charge, $order, $product_id) {
-			echo "horse";
+		public function processSubscription($amount_to_charge, $order, $product_id = '') {
+			//WC_Subscriptions_Manager::process_subscription_payments_on_order( $order);
+			$order->payment_complete();
+			error_log("Process subscription " . $amount_to_charge . " " . $order->id . " " . $product_id );
 		}
 
 		public function billogramCallbacks() {
@@ -227,8 +239,17 @@ function BillogramWCInit() {
 				$order = wc_get_order( $entityBody->custom );
 
 				switch ($entityBody->event->type) {
+					
 					case 'BillogramSent':
-						$order->update_status( 'pending', __( 'Faktura har skickats, inväntar betalning.<br>', 'woocommerce' ) );
+						if(class_exists( 'WC_Subscriptions_Order' ) ) {
+							if (WC_Subscriptions_Order::order_contains_subscription( $order->id ) ) {
+								$order->update_status( 'processing', __( 'Faktura har skickats, inväntar betalning.<br>', 'woocommerce' ) );
+							} else {
+								$order->update_status( 'pending', __( 'Faktura har skickats, inväntar betalning.<br>', 'woocommerce' ) );
+							}
+						} else {
+							$order->update_status( 'pending', __( 'Faktura har skickats, inväntar betalning.<br>', 'woocommerce' ) );
+						}						
 						update_post_meta($order->id, '_billogram_status', $entityBody->billogram->state);
 					break;
 					
@@ -254,10 +275,19 @@ function BillogramWCInit() {
 					break;
 
 					case 'BillogramEnded':
-						// Completed payment with invoice id
-						$order->payment_complete($entityBody->billogram->id);
 						//WC_Subscriptions_Manager::process_subscription_payments_on_order( $entityBody->billogram->id, $product_id = '' );
 						$order->add_order_note(__( 'Hela fakturabeloppet har blivit betalt.', 'woocommerce' ));
+						if(class_exists( 'WC_Subscriptions_Order' ) ) {
+							if (WC_Subscriptions_Order::order_contains_subscription( $order->id ) ) {
+								WC_Subscriptions_Manager::process_subscription_payments_on_order( $order );
+							} else {
+								// Completed payment with invoice id
+								$order->payment_complete($entityBody->billogram->id);
+							}
+						} else {
+							// Completed payment with invoice id
+							$order->payment_complete($entityBody->billogram->id);
+						}
 					break;
 					
 					default:

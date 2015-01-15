@@ -85,6 +85,12 @@ class BillogramApiWrapper {
         return $this->invoice->$key;
     }
     /*
+    * Returns the specified value from the invoice's customer object
+    */
+    public function getInvoiceCustomerValue($key) {
+        return $this->invoice->customer->$key;
+    }
+    /*
     * Adds an item to the invoice data
     * Define invoice data locally before creating the invoice
     */
@@ -162,7 +168,9 @@ class BillogramApiWrapper {
     public function getCustomerField($field='')
     {
         if($field !== '')
-            return $this->customer->$field;
+            if (!empty($this->customer->$field)) {
+                return $this->customer->$field;
+            } else return null;
         throw new Exception("Field must not be empty!", 1);   
     }
     /*
@@ -187,7 +195,7 @@ class BillogramApiWrapper {
     *
     */
     public function customerExists($value='', $field = 'contact:email') {
-        if($email !== '') {
+        if($value !== '') {
             $this->query = $this->api->customers->query()->makeFilter('field', $field, $value);
             // Set query vars for later use, by other functions in the class
             $this->queryVars['field'] = $field;

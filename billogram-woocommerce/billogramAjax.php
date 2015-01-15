@@ -36,6 +36,7 @@ class BillogramAjax {
 			if( $gateway === 'billogramwc') {
 				$invoiceId = get_post_meta($post->ID, '_billogram_id', true);
 				$this->api->getInvoice($invoiceId);
+				//echo $this->api->getInvoiceCustomerValue('email');
 				$this->api->send();
 				echo "Fakturan skickad";
 				wp_die();
