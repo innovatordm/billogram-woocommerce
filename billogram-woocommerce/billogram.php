@@ -77,7 +77,9 @@ function BillogramWCInit() {
 			add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
 		 	// Payment listener/API hook
 			add_action( 'woocommerce_api_billogramwc', array( $this, 'billogramCallbacks' ) );   
+			// Subscription actions/filters
 			add_action( 'scheduled_subscription_payment_billogramwc', array( $this, 'processSubscription' ), 10, 3 );   
+			add_filter( 'woocommerce_subscriptions_renewal_order_meta_query', array( $this, 'processSubscriptionrRenewal' ), 10, 4 );
 		}
 		/**
 		* Output for the order received page.
@@ -110,13 +112,48 @@ function BillogramWCInit() {
 	    * @return array
 	    */
 		public function process_payment( $order_id ) {
+			
+			try {
+				$this->createInvoiceOrder($order_id);
+			} catch (Exception $e) {
+				$order->update_status( 'failed', __( 'Awaiting invoice approval', 'woocommerce' ) );
+				return array(
+					'result' 	=> 'failed',
+					'redirect'	=> $this->get_return_url( $order )
+				);
+			}
+
+			// Mark as on-hold (we're awaiting the manual invoice)
+			$order = wc_get_order( $order_id );
+			if(class_exists( 'WC_Subscriptions_Order' ) ) {
+				if (!WC_Subscriptions_Order::order_contains_subscription( $order->id ) ) {
+					$order->update_status( 'on-hold', __( 'Awaiting invoice approval', 'woocommerce' ) );
+				}
+			} else {
+				$order->update_status( 'on-hold', __( 'Awaiting invoice approval', 'woocommerce' ) );
+			}
+			
+			// Reduce stock levels
+			$order->reduce_order_stock();
+
+			// Remove cart
+			WC()->cart->empty_cart();
+
+			// Return thankyou redirect
+			return array(
+				'result' 	=> 'success',
+				'redirect'	=> $this->get_return_url( $order )
+			);
+		}
+		// Create order invoice
+		public function createInvoiceOrder($order_id)
+		{
 			$order = wc_get_order( $order_id );
 			/*
 			var_dump(get_post_meta($order->id));
 			var_dump($order->get_shipping_method());
 			die; 
 			*/
-			
 			$bill = new BillogramApiWrapper(
 				$this->apiUser,
 				$this->apiPassword,
@@ -197,35 +234,21 @@ function BillogramWCInit() {
 				$order->shipping_postcode, // Zip
 				$order->shipping_city // City
 			);
-			// Mark as on-hold (we're awaiting the manual invoice)
-			
-			if(class_exists( 'WC_Subscriptions_Order' ) ) {
-				if (!WC_Subscriptions_Order::order_contains_subscription( $order->id ) ) {
-					$order->update_status( 'on-hold', __( 'Awaiting invoice approval', 'woocommerce' ) );
-				}
-			} else {
-				$order->update_status( 'on-hold', __( 'Awaiting invoice approval', 'woocommerce' ) );
-			}
-			
-			// Reduce stock levels
-			$order->reduce_order_stock();
-
-			// Remove cart
-			WC()->cart->empty_cart();
-
-			// Return thankyou redirect
-			return array(
-				'result' 	=> 'success',
-				'redirect'	=> $this->get_return_url( $order )
-			);
 		}
-
+		// Subscription related functions
 		public function processSubscription($amount_to_charge, $order, $product_id = '') {
 			WC_Subscriptions_Manager::process_subscription_payments_on_order( $order, $product_id);
-			//$order->payment_complete();
 			error_log("Process subscription " . $amount_to_charge . " " . $order->id . " " . $product_id );
 		}
+		// Don't copy over the original orders invoice data
+		public function processSubscriptionrRenewal( $order_meta_query, $original_order_id, $renewal_order_id, $new_order_role ) {
+			$order = wc_get_order($renewal_order_id);
 
+			$order_meta_query .= " AND `meta_key` NOT IN ('_billogram_id', '_billogram_status', '_billogram_sign_key' )";
+
+			return $order_meta_query;
+		}
+		// Callback function for billogram
 		public function billogramCallbacks() {
 			$entityBody = json_decode(file_get_contents('php://input'));
 			
@@ -243,6 +266,7 @@ function BillogramWCInit() {
 					case 'BillogramSent':
 						if(class_exists( 'WC_Subscriptions_Order' ) ) {
 							if (WC_Subscriptions_Order::order_contains_subscription( $order->id ) ) {
+								error_log("dogs");
 								$order->update_status( 'processing', __( 'Faktura har skickats, inväntar betalning.<br>', 'woocommerce' ) );
 							} else {
 								$order->update_status( 'pending', __( 'Faktura har skickats, inväntar betalning.<br>', 'woocommerce' ) );
@@ -279,6 +303,7 @@ function BillogramWCInit() {
 						$order->add_order_note(__( 'Hela fakturabeloppet har blivit betalt.', 'woocommerce' ));
 						if(class_exists( 'WC_Subscriptions_Order' ) ) {
 							if (WC_Subscriptions_Order::order_contains_subscription( $order->id ) ) {
+								$order->update_status( 'completed', __( 'Prenumeration har betalats.', 'woocommerce' ) );
 								WC_Subscriptions_Manager::process_subscription_payments_on_order( $order );
 							} else {
 								// Completed payment with invoice id

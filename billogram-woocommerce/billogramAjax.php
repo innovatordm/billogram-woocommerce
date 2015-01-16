@@ -35,8 +35,22 @@ class BillogramAjax {
 		try {
 			if( $gateway === 'billogramwc') {
 				$invoiceId = get_post_meta($post->ID, '_billogram_id', true);
-				$this->api->getInvoice($invoiceId);
-				//echo $this->api->getInvoiceCustomerValue('email');
+				if($invoiceId !== '') {
+					$this->api->getInvoice($invoiceId);
+					//echo $this->api->getInvoiceCustomerValue('email');
+					
+				} else {
+					try {
+						$this->bill->createInvoiceOrder($post->ID);
+						$invoiceId = get_post_meta($post->ID, '_billogram_id', true);
+						$this->api->getInvoice($invoiceId);
+					} catch (Exception $e) {
+						$order = wc_get_order($post->ID);
+						$order->update_status( 'failed', __( 'Misslyckades med att skapa fakturan', 'woocommerce' ) );
+						echo "Något gick fel, fakturan har inte skickats!";
+						wp_die();
+					}
+				}
 				$this->api->send();
 				echo "Fakturan skickad";
 				wp_die();
