@@ -25,7 +25,7 @@ foreach ($requires as $require) {
 add_action('plugins_loaded', 'BillogramWCInit', 0);
 
 function BillogramWCInit() {
-
+	
 	if ( !class_exists( 'WC_Payment_Gateway' ) ) return;
 
 	/**
@@ -237,14 +237,20 @@ function BillogramWCInit() {
 		}
 		// Subscription related functions
 		public function processSubscription($amount_to_charge, $order, $product_id = '') {
-			WC_Subscriptions_Manager::process_subscription_payments_on_order( $order, $product_id);
-			error_log("Process subscription " . $amount_to_charge . " " . $order->id . " " . $product_id );
+			$order->payment_complete();
+			//$renewed = get_post_meta($order->id, '_billogram_order_renewed', true);
+			//error_log($renewed . ' for order ' . $order->id);
+			//if($renewed === '') {
+				//update_post_meta($order->id, '_billogram_order_renewed', 'true');
+				WC_Subscriptions_Manager::process_subscription_payments_on_order( $order, $product_id);
+				error_log("Process subscription " . $amount_to_charge . " " . $order->id . " " . $product_id );
+			//}
 		}
 		// Don't copy over the original orders invoice data
 		public function processSubscriptionrRenewal( $order_meta_query, $original_order_id, $renewal_order_id, $new_order_role ) {
 			$order = wc_get_order($renewal_order_id);
 
-			$order_meta_query .= " AND `meta_key` NOT IN ('_billogram_id', '_billogram_status', '_billogram_sign_key' )";
+			$order_meta_query .= " AND `meta_key` NOT IN ('_billogram_id', '_billogram_status', '_billogram_sign_key', '_billogram_order_renewed' )";
 
 			return $order_meta_query;
 		}
@@ -304,7 +310,7 @@ function BillogramWCInit() {
 						if(class_exists( 'WC_Subscriptions_Order' ) ) {
 							if (WC_Subscriptions_Order::order_contains_subscription( $order->id ) ) {
 								$order->update_status( 'completed', __( 'Prenumeration har betalats.', 'woocommerce' ) );
-								WC_Subscriptions_Manager::process_subscription_payments_on_order( $order );
+								//WC_Subscriptions_Manager::process_subscription_payments_on_order( $order );
 							} else {
 								// Completed payment with invoice id
 								$order->payment_complete($entityBody->billogram->id);
