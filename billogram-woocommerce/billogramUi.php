@@ -21,6 +21,13 @@
 		}
 
 		public function addOrderStatusMetaBox() {
+			global $post;
+			
+			$gateway = get_post_meta($post->ID, '_payment_method', true);
+
+			if($gateway !== 'billogramwc')
+				return;
+			
 			add_meta_box( 
 		        'billogramActions', 
 		        __( 'Billogram Faktura åtgärder' ), 
@@ -31,7 +38,11 @@
 		    );
 		}
 		public function orderMetaBox() {
-			echo '<input class="button button-primary tips" id="sendInvoice" value="Skicka faktura" type="submit">';	
+			global $post;
+
+			$invoice_status = get_post_meta($post->ID, '_billogram_status', true);
+			$required = ($invoice_status === '' || $invoice_status === 'Unattested') ? '' : 'disabled';
+			echo '<input class="button button-primary tips" id="sendInvoice" value="Skicka faktura" type="submit"' . $required . '>';	
 		}
 
 		public function loadScripts($hook) {
@@ -42,7 +53,12 @@
 
 			// in JavaScript, object properties are accessed as ajax_object.ajax_url, ajax_object.we_value
 			wp_localize_script( 'billogram-ajax', 'billogramData',
-            array( 'ajaxUrl' => admin_url( 'admin-ajax.php' ), 'orderId' => $post->ID, 'nonce' => wp_create_nonce( "innovBilloNonce" ) ) );
+	            array( 
+	            	'ajaxUrl' => admin_url( 'admin-ajax.php' ), 
+	            	'orderId' => $post->ID, 
+	            	'nonce' => wp_create_nonce( "innovBilloNonce" ) 
+	            ) 
+            );
 		}
 
 		public function shop_order_columns( $columns ) {
