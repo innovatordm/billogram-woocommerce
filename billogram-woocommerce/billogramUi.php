@@ -27,7 +27,7 @@
 
 			if($gateway !== 'billogramwc')
 				return;
-			
+
 			add_meta_box( 
 		        'billogramActions', 
 		        __( 'Billogram Faktura åtgärder' ), 
@@ -80,10 +80,36 @@
 				
 				case 'invoice_status':
 	                $invoice_status = get_post_meta($the_order->id, '_billogram_status', true);
+	                $gateway = get_post_meta($the_order->id, '_payment_method', true);
 	            
-	                if(!empty($invoice_status)){
+	                if($gateway === 'billogramwc'){
 	                   
-	                    echo $invoice_status;
+	                    switch ($invoice_status) {
+	                    	case '':
+	                    	case 'Unattested':
+	                    		echo __( 'Inte skickad', 'woocommerce' );
+	                    	break;
+
+	                    	case 'Sending':
+	                    		echo __( 'Skickad', 'woocommerce' );
+	                    	break;
+
+	                    	case 'Paid':
+	                    		echo __( 'Betald', 'woocommerce' );
+	                    	break;
+
+	                    	case 'PartlyPaid':
+	                    		echo __( 'Delvis betald', 'woocommerce' );
+	                    	break;
+
+	                    	case 'Overdue':
+	                    		echo __( 'Förfallen', 'woocommerce' );
+	                    	break;
+
+	                    	default:
+	                    		echo __( 'Okänd status', 'woocommerce' );
+	                    	break;
+	                    }
 	                }else{
 	                    echo "&mdash;";
 	                }
