@@ -272,7 +272,6 @@ function BillogramWCInit() {
 					case 'BillogramSent':
 						if(class_exists( 'WC_Subscriptions_Order' ) ) {
 							if (WC_Subscriptions_Order::order_contains_subscription( $order->id ) ) {
-								error_log("dogs");
 								$order->update_status( 'processing', __( 'Faktura har skickats, inväntar betalning.<br>', 'woocommerce' ) );
 							} else {
 								$order->update_status( 'pending', __( 'Faktura har skickats, inväntar betalning.<br>', 'woocommerce' ) );
@@ -302,6 +301,23 @@ function BillogramWCInit() {
 								), 
 							0);
 						}
+						update_post_meta($order->id, '_billogram_status', $entityBody->billogram->state);
+					break;
+
+					case 'Overdue':
+						if(class_exists( 'WC_Subscriptions_Order' ) ) {
+							if (WC_Subscriptions_Order::order_contains_subscription( $order->id ) ) {
+								$order->update_status( 'on-hold', __( 'Faktura har förfallit.', 'woocommerce' ) );
+								//WC_Subscriptions_Manager::process_subscription_payments_on_order( $order );
+							} else {
+								// Completed payment with invoice id
+								$order->update_status( 'on-hold', __( 'Faktura har förfallit.', 'woocommerce' ) );
+							}
+						} else {
+							// Completed payment with invoice id
+							$order->update_status( 'on-hold', __( 'Faktura har förfallit.', 'woocommerce' ) );
+						}
+						update_post_meta($order->id, '_billogram_status', $entityBody->billogram->state);
 					break;
 
 					case 'BillogramEnded':
@@ -319,10 +335,11 @@ function BillogramWCInit() {
 							// Completed payment with invoice id
 							$order->payment_complete($entityBody->billogram->id);
 						}
+						update_post_meta($order->id, '_billogram_status', $entityBody->billogram->state);
 					break;
 					
 					default:
-						# code...
+						error_log(print_r( $entityBody, true));
 					break;
 				}
 				wp_die( "Success", "Billogram WC", array( 'response' => 200 ) );

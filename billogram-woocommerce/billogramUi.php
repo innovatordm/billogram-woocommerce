@@ -42,12 +42,16 @@
 
 			$invoice_status = get_post_meta($post->ID, '_billogram_status', true);
 			$required = ($invoice_status === '' || $invoice_status === 'Unattested') ? '' : 'disabled';
+			echo "<h4>Faktura funktioner</h4>";
 			echo '<input class="button button-primary tips" id="sendInvoice" value="Skicka faktura" type="submit"' . $required . '>';	
+			echo "<h4>Prenumeration funktioner</h4>";
+			echo '<input class="button button-primary tips" id="createRenewal" value="Skapa förnyelseorder" type="submit">';
+			echo "<p class='howto'><strong>OBS!</strong> Denna knapp skapar en helt ny order</p>";
 		}
 
 		public function loadScripts($hook) {
 			global $post;
-			if('post.php' !== $hook && $post->post_type !== 'shop_order')
+			if( ( empty($post) ) || 'post.php' !== $hook && $post->post_type !== 'shop_order')
 				return;	
 			wp_enqueue_script( 'billogram-ajax', plugins_url( '/js/billogramAjax.js', __FILE__ ), array('jquery') );
 
@@ -113,17 +117,6 @@
 	                }else{
 	                    echo "&mdash;";
 	                }
-	            
-					/*
-	                if ( '0000-00-00 00:00:00' == $post->post_date ) {
-						$t_time = $h_time = __( 'Unpublished', 'woocommerce' );
-					} else {
-						$t_time    = get_the_time( __( 'Y/m/d g:i:s A', 'woocommerce' ), $post );
-						$gmt_time  = strtotime( $post->post_date_gmt . ' UTC' );
-						$h_time    = get_the_time( __( 'Y/m/d', 'woocommerce' ), $post );
-					}
-					echo '<abbr title="' . esc_attr( $t_time ) . '">' . esc_html( apply_filters( 'post_date_column_time', $h_time, $post ) ) . '</abbr>';
-				     */
 	            break;
 	            
 	        }
