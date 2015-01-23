@@ -32,9 +32,9 @@ class BillogramAjax {
 
 		$post = get_post(intval($_POST['orderId']));
 		$gateway = get_post_meta($post->ID, '_payment_method', true);
-
+		$recurringGateway = get_post_meta($post->ID, '_recurring_payment_method', true);
 		try {
-			if( $gateway === 'billogramwc') {
+			if( $gateway === 'billogramwc' || $recurringGateway === 'billogramwc') {
 				$invoiceId = get_post_meta($post->ID, '_billogram_id', true);
 				if($invoiceId !== '') {
 					$this->api->getInvoice($invoiceId);
