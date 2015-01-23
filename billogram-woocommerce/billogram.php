@@ -112,19 +112,22 @@ function BillogramWCInit() {
 	    * @return array
 	    */
 		public function process_payment( $order_id ) {
-			
+			// Mark as on-hold (we're awaiting the manual invoice)
+			$order = wc_get_order( $order_id );
+
 			try {
 				$this->createInvoiceOrder($order_id);
 			} catch (Exception $e) {
-				$order->update_status( 'failed', __( 'Awaiting invoice approval', 'woocommerce' ) );
+				error_log(print_r($e, true));
+				$order->update_status( 'on-hold', __( '<strong>Misslyckades med att skapa faktura hos Billogram.</strong>', 'woocommerce' ) );
+				// Return thankyou redirect
 				return array(
-					'result' 	=> 'failed',
+					'result' 	=> 'success',
 					'redirect'	=> $this->get_return_url( $order )
 				);
 			}
 
-			// Mark as on-hold (we're awaiting the manual invoice)
-			$order = wc_get_order( $order_id );
+			
 			if(class_exists( 'WC_Subscriptions_Order' ) ) {
 				if (!WC_Subscriptions_Order::order_contains_subscription( $order->id ) ) {
 					$order->update_status( 'on-hold', __( 'Awaiting invoice approval', 'woocommerce' ) );
@@ -228,11 +231,14 @@ function BillogramWCInit() {
 			// Save invoice id to order
 			update_post_meta($order->id, '_billogram_id', $bill->getInvoiceValue('id'));
 			update_post_meta($order->id, '_billogram_status', 'Unattested');
-			// Update invoice with woocommerce address
-			$thing = $bill->updateInvoiceAddress(
-				$order->shipping_address_1, // Street address
-				$order->shipping_postcode, // Zip
-				$order->shipping_city // City
+			// Update invoice with woocommerce order details
+			$thing = $bill->updateInvoiceCusomerDetails(
+				$order->billing_first_name . ' ' . $order->billing_last_name,
+				array(
+                    'street_address' => $order->shipping_address_1, // Street address
+                    'zipcode' => $order->shipping_postcode, // Zip
+                    'city' => $order->shipping_city // City
+                )	
 			);
 		}
 		// Subscription related functions
@@ -339,7 +345,7 @@ function BillogramWCInit() {
 					break;
 					
 					default:
-						error_log(print_r( $entityBody, true));
+						//error_log(print_r( $entityBody, true));
 					break;
 				}
 				wp_die( "Success", "Billogram WC", array( 'response' => 200 ) );

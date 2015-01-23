@@ -107,19 +107,17 @@ class BillogramApiWrapper {
     /*
     * Updates the invoice information at billogram
     */
-    public function updateInvoiceAddress($addr= '', $zip='', $city= '') {
+    public function updateInvoiceCusomerDetails($name = '' , $addr = '') {
         //$this->invoice->refresh();
         $return = $this->invoice->update(
             array(
                 'customer' => array(
-                    'address' => array(
-                        'street_address' => $addr,
-                        'zipcode' => $zip,
-                        'city' => $city,
-                    )
+                    'name' => $name,
+                    'address' => $addr
                 )
             )
         );
+
         //var_dump($this->invoice->id);
         //file_put_contents('response.txt', print_r($return, true));
         return $return;
