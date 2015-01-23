@@ -56,7 +56,10 @@ function BillogramWCInit() {
 				'products', 
 				'subscription_cancellation', 
                	'subscription_suspension', 
-               	'subscription_reactivation', 
+               	'subscription_reactivation',
+               	'subscription_date_changes',
+               	'subscription_payment_method_change',
+               	'subscription_amount_changes'
             );
 			
 			// Plugin settings defines

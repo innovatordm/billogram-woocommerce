@@ -24,8 +24,9 @@
 			global $post;
 			
 			$gateway = get_post_meta($post->ID, '_payment_method', true);
+			$recurringGateway = get_post_meta($post->ID, '_recurring_payment_method', true);
 
-			if($gateway !== 'billogramwc')
+			if($gateway !== 'billogramwc' && $recurringGateway !== 'billogramwc')
 				return;
 
 			add_meta_box( 
@@ -85,8 +86,9 @@
 				case 'invoice_status':
 	                $invoice_status = get_post_meta($the_order->id, '_billogram_status', true);
 	                $gateway = get_post_meta($the_order->id, '_payment_method', true);
+	                $recurringGateway = get_post_meta($post->ID, '_recurring_payment_method', true);
 	            
-	                if($gateway === 'billogramwc'){
+	                if($gateway === 'billogramwc' || $recurringGateway === 'billogramwc'){
 	                   
 	                    switch ($invoice_status) {
 	                    	case '':
