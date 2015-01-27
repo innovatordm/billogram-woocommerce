@@ -14,21 +14,21 @@ Author URI: http://innovator.se/
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
-$requires = array(
-	'billogramApi.php',
-	'billogramUi.php',
-	'billogramAjax.php'
-);
-
-foreach ($requires as $require) {
-	require_once($require);
-}
-
 
 add_action('plugins_loaded', 'BillogramWCInit', 0);
 
 function BillogramWCInit() {
 	
+	$requires = array(
+	'billogramApi.php',
+	'billogramUi.php',
+	'billogramAjax.php'
+	);
+
+	foreach ($requires as $require) {
+		require_once($require);
+	}
+
 	if ( !class_exists( 'WC_Payment_Gateway' ) ) return;
 
 	/**
@@ -94,22 +94,6 @@ function BillogramWCInit() {
 			if ( $this->instructions )
 	      		echo wpautop( wptexturize( $this->instructions ) );
 		}
-		/**
-	    * Add content to the WC emails.
-	    *
-	    * @access public
-	    * @param WC_Order $order
-	    * @param bool $sent_to_admin
-	    * @param bool $plain_text
-	    */
-	  
-	    /*
-		public function email_instructions( $order, $sent_to_admin, $plain_text = false ) {
-	        if ( $this->instructions && ! $sent_to_admin && 'manualinvoice' === $order->payment_method && $order->has_status( 'on-hold' ) ) {
-				echo wpautop( wptexturize( $this->instructions ) ) . PHP_EOL;
-			}
-		}
-	    */
 
 	    /**
 	    * Process the payment and return the result
@@ -443,6 +427,12 @@ function BillogramWCInit() {
 		$methods[] = 'BillogramWC';
 		return $methods;
 	}
-	
+	function initBillogramEmail( $email_classes ) {
+		require_once('billogramEmail.php');
+    	// add the email class to the list of email classes that WooCommerce loads
+    	$email_classes['BillogramEmail'] = new BillogramEmail();
+    	return $email_classes;
+	}
+	add_filter( 'woocommerce_email_classes', 'initBillogramEmail' );
 	add_filter('woocommerce_payment_gateways', 'addBillogramGateway' );
 } 

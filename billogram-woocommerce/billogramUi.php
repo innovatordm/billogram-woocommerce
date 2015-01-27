@@ -27,7 +27,10 @@
 
 			$gateway = get_post_meta($post->ID, '_payment_method', true);
 			$recurringGateway = get_post_meta($post->ID, '_recurring_payment_method', true);
-
+			echo "<pre>";
+			$order = wc_get_order( $post->ID );
+			var_dump($order->payment_method);
+			echo "</pre>";
 			if($gateway !== 'billogramwc' && $recurringGateway !== 'billogramwc')
 				return;
 
