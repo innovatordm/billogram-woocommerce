@@ -80,9 +80,9 @@ function BillogramWCInit() {
 			add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
 		 	// Payment listener/API hook
 			add_action( 'woocommerce_api_billogramwc', array( $this, 'billogramCallbacks' ) );   
-			// Subscription actions/filters
+			// Subscription actions/filters 
 			add_action( 'scheduled_subscription_payment_billogramwc', array( $this, 'processSubscription' ), 10, 3 );   
-			add_filter( 'woocommerce_subscriptions_renewal_order_meta_query', array( $this, 'processSubscriptionrRenewal' ), 10, 4 );
+			add_filter( 'woocommerce_subscriptions_renewal_order_meta_query', array( $this, 'processSubscriptionRenewal' ), 10, 4 );
 		}
 		/**
 		* Output for the order received page.
@@ -131,14 +131,7 @@ function BillogramWCInit() {
 			}
 
 			
-			if(class_exists( 'WC_Subscriptions_Order' ) ) {
-				if (!WC_Subscriptions_Order::order_contains_subscription( $order->id ) ) {
-					$order->update_status( 'on-hold', __( 'Awaiting invoice approval', 'woocommerce' ) );
-				}
-			} else {
-				$order->update_status( 'on-hold', __( 'Awaiting invoice approval', 'woocommerce' ) );
-			}
-			
+			$order->update_status( 'on-hold', __( 'Väntar på att fakturan ska bli skickad', 'woocommerce' ) );
 			// Reduce stock levels
 			$order->reduce_order_stock();
 
@@ -256,11 +249,13 @@ function BillogramWCInit() {
 			//}
 		}
 		// Don't copy over the original orders invoice data
-		public function processSubscriptionrRenewal( $order_meta_query, $original_order_id, $renewal_order_id, $new_order_role ) {
+		public function processSubscriptionRenewal( $order_meta_query, $original_order_id, $renewal_order_id, $new_order_role ) {
 			$order = wc_get_order($renewal_order_id);
 
 			$order_meta_query .= " AND `meta_key` NOT IN ('_billogram_id', '_billogram_status', '_billogram_sign_key', '_billogram_order_renewed' )";
-
+			
+			//$order->update_status( 'on-hold', __( 'Väntar på att fakturan ska bli skickad', 'woocommerce' ) );
+			
 			return $order_meta_query;
 		}
 		// Callback function for billogram
@@ -317,7 +312,7 @@ function BillogramWCInit() {
 						if(class_exists( 'WC_Subscriptions_Order' ) ) {
 							if (WC_Subscriptions_Order::order_contains_subscription( $order->id ) ) {
 								$order->update_status( 'on-hold', __( 'Faktura har förfallit.', 'woocommerce' ) );
-								//WC_Subscriptions_Manager::process_subscription_payments_on_order( $order );
+								WC_Subscriptions_Manager::process_subscription_payment_failure_on_order( $order, $product_id = '' );
 							} else {
 								// Completed payment with invoice id
 								$order->update_status( 'on-hold', __( 'Faktura har förfallit.', 'woocommerce' ) );
@@ -333,7 +328,7 @@ function BillogramWCInit() {
 						//WC_Subscriptions_Manager::process_subscription_payments_on_order( $entityBody->billogram->id, $product_id = '' );
 						$order->add_order_note(__( 'Hela fakturabeloppet har blivit betalt.', 'woocommerce' ));
 						if(class_exists( 'WC_Subscriptions_Order' ) ) {
-							if (WC_Subscriptions_Order::order_contains_subscription( $order->id ) ) {
+							if (WC_Subscriptions_Order::order_contains_subscription( $order->id ) || count( WC_Subscriptions_Manager::get_subscription( WC_Subscriptions_Manager::get_subscription_key( $order->id, $product_id = '' )) ) > 0) {
 								$order->update_status( 'completed', __( 'Prenumeration har betalats.', 'woocommerce' ) );
 								//WC_Subscriptions_Manager::process_subscription_payments_on_order( $order );
 							} else {

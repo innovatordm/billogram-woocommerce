@@ -23,6 +23,11 @@
 		public function addOrderStatusMetaBox() {
 			global $post;
 			
+			echo "<pre>";
+			$sub = get_post_meta(WC_Subscriptions_Manager::get_subscription_key( $post->ID, $product_id = '' ));
+			var_dump($sub);
+			echo "</pre>";
+
 			$gateway = get_post_meta($post->ID, '_payment_method', true);
 			$recurringGateway = get_post_meta($post->ID, '_recurring_payment_method', true);
 
@@ -44,10 +49,17 @@
 			$invoice_status = get_post_meta($post->ID, '_billogram_status', true);
 			$required = ($invoice_status === '' || $invoice_status === 'Unattested') ? '' : 'disabled';
 			echo "<h4>Faktura funktioner</h4>";
-			echo '<input class="button button-primary tips" id="sendInvoice" value="Skicka faktura" type="submit"' . $required . '>';	
-			echo "<h4>Prenumeration funktioner</h4>";
-			echo '<input class="button button-primary tips" id="createRenewal" value="Skapa förnyelseorder" type="submit">';
-			echo "<p class='howto'><strong>OBS!</strong> Denna knapp skapar en helt ny order</p>";
+			echo '<input class="button button-primary" id="sendInvoice" value="Skicka faktura" type="submit"' . $required . '>';	
+			if(class_exists( 'WC_Subscriptions_Order' ) ) {
+				echo "<h4>Prenumeration funktioner</h4>";
+				if (WC_Subscriptions_Order::order_contains_subscription( $post->ID ) ) {
+					echo '<input class="button button-primary" id="createRenewal" value="Skapa förnyelseorder" type="submit">';	
+				} else {
+					echo "<p class='howto'><strong>Du måste använda original ordern för att skapa en ny förnyelseorder.</strong></p>";
+					echo '<input class="button button-primary" id="createRenewal" value="Skapa förnyelseorder" type="submit" disabled>';
+				}
+				echo "<p class='howto'><strong>OBS!</strong> Använd endast om du vill skapa en ny förnyelseorder!</p>";
+			}
 		}
 
 		public function loadScripts($hook) {

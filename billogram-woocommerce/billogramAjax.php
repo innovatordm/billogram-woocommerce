@@ -17,9 +17,6 @@ class BillogramAjax {
 	
 	function __construct() {
 		$this->bill = new BillogramWC;
-		/*
-		echo $this->bill->apiUrl;
-		die; */
 
 		$this->api = new BillogramApiWrapper($this->bill->apiUser, $this->bill->apiPassword, $this->bill->apiUrl);
 		add_action('wp_ajax_send_invoice', array($this, 'sendInvoice'));
@@ -74,6 +71,7 @@ class BillogramAjax {
 				$invoiceId = get_post_meta($post->ID, '_billogram_id', true);
 				if(class_exists( 'WC_Subscriptions_Order' ) ) {
 					if (WC_Subscriptions_Order::order_contains_subscription( $post->ID ) ) {
+						//WC_Subscriptions_Manager::process_subscription_payment_failure_on_order( $post->ID, $product_id = '');
 						WC_Subscriptions_Manager::process_subscription_payments_on_order( $post->ID, $product_id = '');
 						echo "Order skapad!";
 					} else {
