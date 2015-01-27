@@ -3,6 +3,8 @@
 	* Class to handle ui elements of the plugin
 	*/
 
+	if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 	function billogramUiInit() {
 		new BillogramUi;
 	}
@@ -22,11 +24,6 @@
 
 		public function addOrderStatusMetaBox() {
 			global $post;
-			
-			echo "<pre>";
-			$sub = get_post_meta(WC_Subscriptions_Manager::get_subscription_key( $post->ID, $product_id = '' ));
-			var_dump($sub);
-			echo "</pre>";
 
 			$gateway = get_post_meta($post->ID, '_payment_method', true);
 			$recurringGateway = get_post_meta($post->ID, '_recurring_payment_method', true);

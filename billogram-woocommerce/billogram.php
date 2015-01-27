@@ -11,6 +11,9 @@ Author URI: http://innovator.se/
 	License: All rights reserved
 	License URI: http://www.innovator.se
 */
+
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 $requires = array(
 	'billogramApi.php',
 	'billogramUi.php',

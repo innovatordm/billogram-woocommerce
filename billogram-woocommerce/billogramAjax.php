@@ -1,8 +1,11 @@
 <?php
 
-/**
-* 
-*/
+	/**
+	* Class to handle all ajax calls to the plugin
+	*/
+
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 require_once('billogramApi.php');
 
 function billogramAjaxInit() {
