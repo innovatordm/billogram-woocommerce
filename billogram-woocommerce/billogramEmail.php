@@ -30,20 +30,20 @@ class BillogramEmail extends WC_Email {
 	    $this->subject = 'Orderbekräftelse';
 	 
 	    // these define the locations of the templates that this email should use, we'll just use the new order template since this email is similar
-	    $this->template_html  = 'emails/customer-processing-order.php';
-	    $this->template_plain = 'emails/plain/customer-processing-order.php';
-	 
-	    // Trigger on new paid orders
-	 	add_action( 'woocommerce_thankyou_billogramwc',  array( $this, 'trigger' ), 10, 1 );
-	    // Call parent constructor to load any other defaults not explicity defined here
-	    parent::__construct();
-	 
+	    $this->template_html  = 'emails/customer-processing-invoice.php';
+	    $this->template_plain = 'emails/plain/customer-processing-invoice.php';
+	 	$this->template_base  = plugin_dir_path(__FILE__) . 'templates/';
+	 	error_log('Email class');
+	 	add_action( 'billogram_order_confirmation_email',  array( $this, 'trigger' ), 10, 1 );
+	    
 	    // this sets the recipient to the settings defined below in init_form_fields()
 	    $this->recipient = $this->get_option( 'recipient' );
 	 
 	    // if none was entered, just use the WP admin email as a fallback
 	    if ( ! $this->recipient )
 	        $this->recipient = get_option( 'admin_email' );
+		// Call parent constructor to load any other defaults not explicity defined here
+		parent::__construct();
 	}
 
 	/**
@@ -53,7 +53,8 @@ class BillogramEmail extends WC_Email {
 	 * @param int $order_id
 	 */
 	public function trigger( $order_id ) {
- 
+
+ 		error_log("Send mail for order: " . $order_id);
 	    // bail if no order ID is present
 	    if ( ! $order_id )
 	        return;
@@ -72,7 +73,8 @@ class BillogramEmail extends WC_Email {
 	        return;
 	 
 	    // woohoo, send the email!
-	    $this->send( $this->get_recipient(), $this->get_subject(), $this->get_content(), $this->get_headers(), $this->get_attachments() );
+	    $return = $this->send( $this->get_recipient(), $this->get_subject(), $this->get_content(), $this->get_headers(), $this->get_attachments() );
+		error_log($this->get_content());
 	}
 
 	/**
@@ -82,12 +84,17 @@ class BillogramEmail extends WC_Email {
 	 * @return string
 	 */
 	public function get_content_html() {
-	    ob_start();
-	    woocommerce_get_template( $this->template_html, array(
-	        'order'         => $this->object,
-	        'email_heading' => $this->get_heading()
-	    ) );
-	    return ob_get_clean();
+		ob_start();
+		woocommerce_get_template(
+			$this->template_html,
+			array(
+				'order'         => $this->object,
+				'email_heading' => $this->get_heading()
+			),
+			'',
+			$this->template_base
+		);
+		return ob_get_clean();
 	}
  
  
@@ -98,12 +105,17 @@ class BillogramEmail extends WC_Email {
 	 * @return string
 	 */
 	public function get_content_plain() {
-	    ob_start();
-	    woocommerce_get_template( $this->template_plain, array(
-	        'order'         => $this->object,
-	        'email_heading' => $this->get_heading()
-	    ) );
-	    return ob_get_clean();
+		ob_start();
+		woocommerce_get_template(
+			$this->template_plain,
+			array(
+				'order'         => $this->object,
+				'email_heading' => $this->get_heading()
+			),
+			'',
+			$this->template_base
+		);
+		return ob_get_clean();
 	}
 	/**
 	 * Initialize Settings Form Fields

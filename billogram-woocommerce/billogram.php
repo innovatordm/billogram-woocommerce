@@ -22,7 +22,8 @@ function BillogramWCInit() {
 	$requires = array(
 	'billogramApi.php',
 	'billogramUi.php',
-	'billogramAjax.php'
+	'billogramAjax.php',
+	'billogramStatus.php'
 	);
 
 	foreach ($requires as $require) {
@@ -47,6 +48,7 @@ function BillogramWCInit() {
 		*
 		*/
 	 	public function __construct() {
+	 		
 		 	$this->id                   = 'billogramwc';
 			$this->has_fields           = true;
 			$this->liveurl              = 'https://billogram.com/api/v2';
@@ -64,7 +66,7 @@ function BillogramWCInit() {
                	'subscription_payment_method_change',
                	'subscription_amount_changes'
             );
-			
+			error_log('Billogram class');
 			// Plugin settings defines
 			$this->init_form_fields();
 			$this->init_settings(); // Init settings for usage
@@ -109,16 +111,16 @@ function BillogramWCInit() {
 				$this->createInvoiceOrder($order_id);
 			} catch (Exception $e) {
 				error_log(print_r($e, true));
-				$order->update_status( 'on-hold', __( '<strong>Misslyckades med att skapa faktura hos Billogram.</strong>', 'woocommerce' ) );
+				$order->update_status( 'wc-awaiting-approval', __( '<strong>Misslyckades med att skapa faktura hos Billogram.</strong>', 'woocommerce' ) );
 				// Return thankyou redirect
 				return array(
 					'result' 	=> 'success',
 					'redirect'	=> $this->get_return_url( $order )
 				);
 			}
-
-			
-			$order->update_status( 'on-hold', __( 'Väntar på att fakturan ska bli skickad', 'woocommerce' ) );
+			do_action('billogram_order_confirmation_email', $order_id);
+			// Set to on-hold for invoice approval
+			$order->update_status( 'wc-awaiting-approval', __( 'Väntar på att ordern ska bli godkänd', 'woocommerce' ) );
 			// Reduce stock levels
 			$order->reduce_order_stock();
 
@@ -385,6 +387,7 @@ function BillogramWCInit() {
 				),
 				'paymentaction' => array(
 					'title'       => __( 'Godkänn och skicka fakturor', 'woocommerce' ),
+					'disabled'	  => true,
 					'type'        => 'select',
 					'description' => __( 'Välj om du vill skicka fakturor automatiskt, eller om du vill godkänna dom först.', 'woocommerce' ),
 					'default'     => 'authorize',
@@ -433,6 +436,10 @@ function BillogramWCInit() {
     	$email_classes['BillogramEmail'] = new BillogramEmail();
     	return $email_classes;
 	}
+	// Add custom order statuses
+	add_action( 'init', 'billogramStatus::registerAllStatuses' );
+	add_filter( 'wc_order_statuses', 'billogramStatus::addStatusToBillogram' );
+
 	add_filter( 'woocommerce_email_classes', 'initBillogramEmail' );
 	add_filter('woocommerce_payment_gateways', 'addBillogramGateway' );
 } 

@@ -27,10 +27,7 @@
 
 			$gateway = get_post_meta($post->ID, '_payment_method', true);
 			$recurringGateway = get_post_meta($post->ID, '_recurring_payment_method', true);
-			echo "<pre>";
-			$order = wc_get_order( $post->ID );
-			var_dump($order->payment_method);
-			echo "</pre>";
+
 			if($gateway !== 'billogramwc' && $recurringGateway !== 'billogramwc')
 				return;
 
@@ -67,7 +64,8 @@
 			if( ( empty($post) ) || 'post.php' !== $hook && $post->post_type !== 'shop_order')
 				return;	
 			wp_enqueue_script( 'billogram-ajax', plugins_url( '/js/billogramAjax.js', __FILE__ ), array('jquery') );
-
+			wp_enqueue_style( 'billo-fontawesome', plugins_url('css/font-awesome/css/font-awesome.min.css', __FILE__));
+			wp_enqueue_style( 'billogram-statusStyle', plugins_url('css/style.css', __FILE__), array('billo-fontawesome'));
 			// in JavaScript, object properties are accessed as ajax_object.ajax_url, ajax_object.we_value
 			wp_localize_script( 'billogram-ajax', 'billogramData',
 	            array( 
