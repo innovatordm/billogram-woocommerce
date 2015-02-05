@@ -23,7 +23,8 @@ function BillogramWCInit() {
 	'billogramApi.php',
 	'billogramUi.php',
 	'billogramAjax.php',
-	'billogramStatus.php'
+	'billogramStatus.php',
+	'billogramEmail.php'
 	);
 
 	foreach ($requires as $require) {
@@ -66,7 +67,7 @@ function BillogramWCInit() {
                	'subscription_payment_method_change',
                	'subscription_amount_changes'
             );
-			error_log('Billogram class');
+			//error_log('Billogram class');
 			// Plugin settings defines
 			$this->init_form_fields();
 			$this->init_settings(); // Init settings for usage
@@ -118,7 +119,7 @@ function BillogramWCInit() {
 					'redirect'	=> $this->get_return_url( $order )
 				);
 			}
-			do_action('billogram_order_confirmation_email', $order_id);
+			do_action('woocommerce_order_status_pending_to_awaiting_approval', $order_id);
 			// Set to on-hold for invoice approval
 			$order->update_status( 'wc-awaiting-approval', __( 'Väntar på att ordern ska bli godkänd', 'woocommerce' ) );
 			// Reduce stock levels
@@ -436,10 +437,16 @@ function BillogramWCInit() {
     	$email_classes['BillogramEmail'] = new BillogramEmail();
     	return $email_classes;
 	}
+	function initEmail($actions)
+	{
+		error_log('add_action');
+		add_action( 'woocommerce_order_status_pending_to_awaiting-approval', array( WC(), 'send_transactional_email' ), 10, 10 );
+	}
 	// Add custom order statuses
 	add_action( 'init', 'billogramStatus::registerAllStatuses' );
+	//add_action( 'woocommerce_init', 'initEmail' );
 	add_filter( 'wc_order_statuses', 'billogramStatus::addStatusToBillogram' );
 
-	add_filter( 'woocommerce_email_classes', 'initBillogramEmail' );
+	/* add_filter( 'woocommerce_email_classes', 'initBillogramEmail' ); */
 	add_filter('woocommerce_payment_gateways', 'addBillogramGateway' );
 } 
