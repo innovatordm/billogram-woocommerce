@@ -19,14 +19,18 @@ class BillogramAjax {
 			$api;
 	
 	function __construct() {
-		$this->bill = new BillogramWC;
-
-		$this->api = new BillogramApiWrapper($this->bill->apiUser, $this->bill->apiPassword, $this->bill->apiUrl);
 		add_action('wp_ajax_send_invoice', array($this, 'sendInvoice'));
 		add_action('wp_ajax_create_renewal', array($this, 'createRenewal'));
 	}
 
+	public function setup()
+	{
+		$this->bill = new BillogramWC;
+		$this->api = new BillogramApiWrapper($this->bill->apiUser, $this->bill->apiPassword, $this->bill->apiUrl);
+	}
+
 	public function sendInvoice() {
+		$this->setup();
 		// Check nonce, if invalid die
 		check_ajax_referer( "innovBilloNonce", "BillSec", true );
 
@@ -47,22 +51,23 @@ class BillogramAjax {
 						$this->api->getInvoice($invoiceId);
 					} catch (Exception $e) {
 						$order = wc_get_order($post->ID);
-						$order->update_status( 'failed', __( 'Misslyckades med att skapa fakturan', 'woocommerce' ) );
-						echo "Något gick fel, fakturan har inte skickats!";
+						$order->update_status( 'failed', __( 'Failed to create the invoice', 'billogram-wc' ) );
+						echo __("Something went wrong, the invoice was not sent!", 'billogram-wc' );
 						wp_die();
 					}
 				}
 				$this->api->send();
-				echo "Fakturan skickad";
+				echo __("Invoice sent", 'billogram-wc' );
 				wp_die();
 			}
 		} catch (Exception $e) {
-			echo "Något gick fel, fakturan har inte skickats!";
+			echo __("Something went wrong, the invoice was not sent!", 'billogram-wc' );
 		}
 		wp_die();
 	}
 
 	public function createRenewal() {
+		$this->setup();
 		// Check nonce, if invalid die
 		check_ajax_referer( "innovBilloNonce", "BillSec", true );
 
@@ -76,17 +81,17 @@ class BillogramAjax {
 					if (WC_Subscriptions_Order::order_contains_subscription( $post->ID ) ) {
 						//WC_Subscriptions_Manager::process_subscription_payment_failure_on_order( $post->ID, $product_id = '');
 						WC_Subscriptions_Manager::process_subscription_payments_on_order( $post->ID, $product_id = '');
-						echo "Order skapad!";
+						echo __("Order created!", 'billogram-wc' );
 					} else {
-						echo "Ordern innehåller ingen prenumeration!";	
+						echo __("This order does not contain any subscriptions!", 'billogram-wc' );	
 					}
 				} else {
-					echo "Woocommerce Subscriptions hittades inte!";
+					echo __("Woocommerce Subscriptions was not found!", 'billogram-wc' );
 				}
 				wp_die();
 			}
 		} catch (Exception $e) {
-			echo "Något gick fel, ordern har inte skapats!";
+			echo __("Something went wrong, the order was not created!", 'billogram-wc' );
 		}
 		wp_die();
 	}

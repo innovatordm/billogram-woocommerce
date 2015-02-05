@@ -3,13 +3,13 @@
 /**
 * Class for adding custom order statuses
 */
-class billogramStatus
+class BillogramStatus
 {
 
 	private static function getStatuses() {
 		$statuses = array(
 			'wc-awaiting-approval' => array(
-				'label'                     => __('Awaiting Approval', 'woocommerce'),
+				'label'                     => 'Awaiting Approval',
 	        	'public'                    => true,
 	        	'exclude_from_search'       => false,
 	        	'show_in_admin_all_list'    => true,

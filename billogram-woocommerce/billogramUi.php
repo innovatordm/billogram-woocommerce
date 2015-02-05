@@ -33,7 +33,7 @@
 
 			add_meta_box( 
 		        'billogramActions', 
-		        __( 'Billogram Faktura åtgärder' ), 
+		        __( 'Billogram Invoice Actions', 'billogram-wc' ), 
 		        array( $this, 'orderMetaBox' ), 
 		        'shop_order', 
 		        'side', 
@@ -45,17 +45,17 @@
 
 			$invoice_status = get_post_meta($post->ID, '_billogram_status', true);
 			$required = ($invoice_status === '' || $invoice_status === 'Unattested') ? '' : 'disabled';
-			echo "<h4>Faktura funktioner</h4>";
+			echo __("<h4>Invoice actions</h4>", 'billogram-wc' );
 			echo '<input class="button button-primary" id="sendInvoice" value="Skicka faktura" type="submit"' . $required . '>';	
 			if(class_exists( 'WC_Subscriptions_Order' ) ) {
-				echo "<h4>Prenumeration funktioner</h4>";
+				echo __("<h4>subscription actions</h4>", 'billogram-wc' );
 				if (WC_Subscriptions_Order::order_contains_subscription( $post->ID ) ) {
 					echo '<input class="button button-primary" id="createRenewal" value="Skapa förnyelseorder" type="submit">';	
 				} else {
-					echo "<p class='howto'><strong>Du måste använda original ordern för att skapa en ny förnyelseorder.</strong></p>";
+					echo __("<p class='howto'><strong>You must use the original sbuscription order, in order to create a renewal order.</strong></p>", 'billogram-wc' );
 					echo '<input class="button button-primary" id="createRenewal" value="Skapa förnyelseorder" type="submit" disabled>';
 				}
-				echo "<p class='howto'><strong>OBS!</strong> Använd endast om du vill skapa en ny förnyelseorder!</p>";
+				echo __("<p class='howto'><strong>NOTE!</strong> Only use this if you want to create a new renewal order!</p>", 'billogram-wc' );
 			}
 		}
 
@@ -77,7 +77,7 @@
 		}
 
 		public function shop_order_columns( $columns ) {
-	        $columns['invoice_status']    = __( 'Faktura status', 'woocommerce' );  
+	        $columns['invoice_status']    = __( 'Invoice status', 'billogram-wc' );  
 	        return $columns;
 	    }
 
@@ -103,27 +103,27 @@
 	                    switch ($invoice_status) {
 	                    	case '':
 	                    	case 'Unattested':
-	                    		echo __( 'Inte skickad', 'woocommerce' );
+	                    		echo __( 'Not sent', 'billogram-wc' );
 	                    	break;
 
 	                    	case 'Sending':
-	                    		echo __( 'Skickad', 'woocommerce' );
+	                    		echo __( 'Sent', 'billogram-wc' );
 	                    	break;
 
 	                    	case 'Paid':
-	                    		echo __( 'Betald', 'woocommerce' );
+	                    		echo __( 'Paid', 'billogram-wc' );
 	                    	break;
 
 	                    	case 'PartlyPaid':
-	                    		echo __( 'Delvis betald', 'woocommerce' );
+	                    		echo __( 'Partially paid', 'billogram-wc' );
 	                    	break;
 
 	                    	case 'Overdue':
-	                    		echo __( 'Förfallen', 'woocommerce' );
+	                    		echo __( 'Expired', 'billogram-wc' );
 	                    	break;
 
 	                    	default:
-	                    		echo __( 'Okänd status', 'woocommerce' );
+	                    		echo __( 'Unknown status', 'billogram-wc' );
 	                    	break;
 	                    }
 	                }else{

@@ -20,14 +20,14 @@ class BillogramAwaitingApprovalEmail extends WC_Email {
 	    $this->id = 'billogram_order_confirmation';
 	 
 	    // this is the title in WooCommerce Email settings
-	    $this->title = 'Orderbekräftelse';
+	    $this->title = __('Billogram Order received', 'billogram-wc' );
 	 
 	    // this is the description in WooCommerce email settings
-	    $this->description = 'Skicka ut orderbekräftelse för billogram gateway';
+	    $this->description = __('Send a notification to the user that their order has been received', 'billogram-wc' );
 	 
 	    // these are the default heading and subject lines that can be overridden using the settings
-	    $this->heading = 'Orderbekräftelse';
-	    $this->subject = 'Orderbekräftelse';
+	    $this->heading = __('Billogram Order received', 'billogram-wc' );
+	    $this->subject = __('Billogram Order received', 'billogram-wc' );
 	 
 	    // these define the locations of the templates that this email should use, we'll just use the new order template since this email is similar
 	    $this->template_html  = 'emails/customer-processing-invoice.php';
@@ -128,29 +128,29 @@ class BillogramAwaitingApprovalEmail extends WC_Email {
 	 
 	    $this->form_fields = array(
 	        'enabled'    => array(
-	            'title'   => 'Enable/Disable',
+	            'title'   => __('Enable/Disable', 'billogram-wc' ),
 	            'type'    => 'checkbox',
-	            'label'   => 'Enable this email notification',
+	            'label'   => __('Enable this email notification', 'billogram-wc' ),
 	            'default' => 'yes'
 	        ),
 	        'subject'    => array(
-	            'title'       => 'Subject',
+	            'title'       => __('Subject', 'billogram-wc' ),
 	            'type'        => 'text',
-	            'description' => sprintf( 'This controls the email subject line. Leave blank to use the default subject: <code>%s</code>.', $this->subject ),
+	            'description' => sprintf( __('This controls the email subject line. Leave blank to use the default subject: <code>%s</code>.', 'billogram-wc' ), $this->subject ),
 	            'placeholder' => '',
-	            'default'     => 'Orderbekräftelse'
+	            'default'     => __('Order received', 'billogram-wc' )
 	        ),
 	        'heading'    => array(
-	            'title'       => 'Email Heading',
+	            'title'       => __('Email Heading', 'billogram-wc' ),
 	            'type'        => 'text',
-	            'description' => sprintf( __( 'This controls the main heading contained within the email notification. Leave blank to use the default heading: <code>%s</code>.' ), $this->heading ),
+	            'description' => sprintf( __( 'This controls the main heading contained within the email notification. Leave blank to use the default heading: <code>%s</code>.', 'billogram-wc' ), $this->heading ),
 	            'placeholder' => '',
-	            'default'     => 'Orderbekräftelse'
+	            'default'     => __('Order received', 'billogram-wc' )
 	        ),
 	        'email_type' => array(
-	            'title'       => 'Email type',
+	            'title'       => __('Email type', 'billogram-wc' ),
 	            'type'        => 'select',
-	            'description' => 'Choose which format of email to send.',
+	            'description' => __('Choose which format of email to send.', 'billogram-wc' ),
 	            'default'     => 'html',
 	            'class'       => 'email_type',
 	            'options'     => array(

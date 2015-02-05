@@ -14,7 +14,6 @@ class BillogramEmail {
 	public static function init() {
 
 		add_action( 'woocommerce_email_classes', __CLASS__ . '::addEmails', 10, 1 );
-
 		add_action( 'woocommerce_init', __CLASS__ . '::hookEmails' );
 	}
 
