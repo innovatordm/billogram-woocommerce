@@ -387,10 +387,10 @@ function BillogramWCInit() {
 					'description' => '',
 				),
 				'paymentaction' => array(
-					'title'       => __( 'Approval settings', 'billogram-wc' ),
+					'title'       => __( 'Dispatch settings', 'billogram-wc' ),
 					'disabled'	  => true,
 					'type'        => 'select',
-					'description' => __( 'Choose whether you want to approve invoices automatically or manually on orders.', 'billogram-wc' ),
+					'description' => __( 'Choose whether you want to send invoices automatically or manually on orders.', 'billogram-wc' ),
 					'default'     => 'authorize',
 					'desc_tip'    => true,
 					'options'     => array(
