@@ -9,12 +9,12 @@ class BillogramStatus
 	private static function getStatuses() {
 		$statuses = array(
 			'wc-awaiting-approval' => array(
-				'label'                     => 'Awaiting Approval',
+				'label'                     => __('Awaiting Approval', 'billogram-wc' ),
 	        	'public'                    => true,
 	        	'exclude_from_search'       => false,
 	        	'show_in_admin_all_list'    => true,
 	        	'show_in_admin_status_list' => true,
-	        	'label_count'				=> _n_noop( 'Awaiting Approval <span class="count">(%s)</span>', 'Awaiting Invoice <span class="count">(%s)</span>' )
+	        	'label_count'				=> _n_noop( 'Awaiting Approval <span class="count">(%s)</span>', 'Awaiting Approval <span class="count">(%s)</span>' )
 	        )
 		);
 		return $statuses;
