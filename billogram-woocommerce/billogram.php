@@ -365,7 +365,7 @@ function BillogramWCInit() {
 					'type'        => 'text',
 					'desc_tip'    => true,
 					'description' => __( 'Write the description you want to be showed at checkout.', 'billogram-wc' ),
-					'default'     => __( 'Pay by invoice', 'billogram-wc' )
+					'default'     => __( 'Pay by invoice.', 'billogram-wc' )
 				),
 				'testmode' => array(
 					'title'       => __( 'Billogram sandbox', 'billogram-wc' ),
