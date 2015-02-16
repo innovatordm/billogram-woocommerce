@@ -1,0 +1,19 @@
+.column-order_status mark.awaiting-approval:after {
+	color: #FF9200;
+	font-family: 'FontAwesome';
+	speak: none;
+	font-weight: 400;
+	font-variant: normal;
+	text-transform: none;
+	font-size: 20px;
+	-webkit-font-smoothing: antialiased;
+	margin: 0;
+	content: "\f071";
+	text-indent: 0;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	text-align: center;
+}

@@ -1,0 +1,429 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: WooCommerce Billogram Gateway v0.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: 2015-02-06 09:12:42+0000\n"
+"Last-Translator: admin <kristoffer.bergman@innovator.se>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: CSL v1.x\n"
+"X-Poedit-Language: Swedish\n"
+"X-Poedit-Country: SWEDEN\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Poedit-KeywordsList: __;_e;__ngettext:1,2;_n:1,2;__ngettext_noop:1,2;_n_noop:1,2;_c,_nc:4c,1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;_nx_noop:4c,1,2;\n"
+"X-Poedit-Basepath: \n"
+"X-Poedit-Bookmarks: \n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Textdomain-Support: yes"
+
+#: billogram.php:57
+#: billogram.php:360
+#@ billogram-wc
+msgid "Billogram"
+msgstr ""
+
+#: billogram.php:58
+#: billogram.php:368
+#@ billogram-wc
+msgid "Pay by invoice."
+msgstr "Betala med faktura."
+
+#: billogram.php:115
+#@ billogram-wc
+msgid "<strong>Failed to create invoice at Billogram.</strong>"
+msgstr "<strong>Misslyckades med att skapa faktura hos Billogram.</strong>"
+
+#: billogram.php:124
+#@ billogram-wc
+msgid "Waiting for order approval."
+msgstr "Väntar på att ordern ska bli godkänd."
+
+#: billogram.php:269
+#: billogram.php:271
+#: billogram.php:274
+#@ billogram-wc
+msgid "Invoice sent, waiting for payment.<br>"
+msgstr "Faktura skickad, inväntar betalning.<br>"
+
+#: billogram.php:284
+#, php-format
+#@ billogram-wc
+msgid "Manual payment for invoice, registered by seller.<br>Amount: %d kr.<br>%d kr remains to be paid."
+msgstr "Manuell betalning för faktura, registererad av säljare.<br>Belopp: %d kr.<br>%d kr kvarstår att betalas."
+
+#: billogram.php:292
+#, php-format
+#@ billogram-wc
+msgid "Payment from customer received.<br>Amount: %d kr. <br>%d kr remains to be paid."
+msgstr "Betalning från kund mottagen.<br>Belopp: %d kr.<br>%d kr kvarstår att betalas."
+
+#: billogram.php:304
+#: billogram.php:308
+#: billogram.php:312
+#@ billogram-wc
+msgid "Invoice has expired."
+msgstr "Fakturan har förfallit."
+
+#: billogram.php:319
+#@ billogram-wc
+msgid "The invoice has been paid in whole."
+msgstr "Hela fakturabeloppet betalt."
+
+#: billogram.php:322
+#@ billogram-wc
+msgid "Subscription has been paid."
+msgstr "Prenumerationen har betalats."
+
+#: billogram.php:351
+#@ billogram-wc
+msgid "Activate/Deactivate"
+msgstr "Aktiver/Deaktivera"
+
+#: billogram.php:353
+#@ billogram-wc
+msgid "Activate Billogram"
+msgstr "Aktivera Billogram"
+
+#: billogram.php:357
+#@ billogram-wc
+msgid "Title"
+msgstr "Titel"
+
+#: billogram.php:359
+#@ billogram-wc
+msgid "Write the title you want to be displayed at checkout."
+msgstr "Skriv den titel du vill visa vid kassan."
+
+#: billogram.php:364
+#@ billogram-wc
+msgid "Description"
+msgstr "Beskrivning"
+
+#: billogram.php:367
+#@ billogram-wc
+msgid "Write the description you want to be showed at checkout."
+msgstr "Skriv den beskrivning du vill visa vid kassan."
+
+#: billogram.php:371
+#@ billogram-wc
+msgid "Billogram sandbox"
+msgstr "Billogram test miljö"
+
+#: billogram.php:373
+#@ billogram-wc
+msgid "Activate Billogram test environment"
+msgstr "Aktivera Billograms test miljö"
+
+#: billogram.php:375
+#, php-format
+#@ billogram-wc
+msgid "Test billogram in the sanbox environment, you must register a Sanbox account with Billogram in order to use this feature. More information can be found <a href=\"%s\">here</a>."
+msgstr "Testa billogram i deras test miljö, du måste registrera ett separat konto hos Billogram för att kunna använda denna tjänst. Mer information kan hittas <a href=\"%s\">här</a>."
+
+#: billogram.php:385
+#@ billogram-wc
+msgid "Invoice settings"
+msgstr "Faktura inställningar"
+
+#: billogram.php:397
+#@ billogram-wc
+msgid "Send invoices automatically"
+msgstr "Skicka fakturor automatiskt"
+
+#: billogram.php:398
+#@ billogram-wc
+msgid "Send invoices manually"
+msgstr "Skicka fakturor manuellt"
+
+#: billogram.php:402
+#@ billogram-wc
+msgid "API settings"
+msgstr "API inställningar"
+
+#: billogram.php:404
+#, php-format
+#@ billogram-wc
+msgid "To find your API credentials; login to Billogram and navigate to the account settings, then scroll down to the bottom of the page.  %sLink to Billogram settings page%s."
+msgstr "För att hitta dina API detaljer väljer du som inloggad först inställningar högst upp till höger, scrolla ned till sektionen API och skapa en API-nyckel. %sLänk till billogram inställningar%s."
+
+#: billogram.php:408
+#@ billogram-wc
+msgid "API Username"
+msgstr "API användarnamn"
+
+#: billogram.php:410
+#@ billogram-wc
+msgid "Your API username for Billogram API."
+msgstr "API för Billograms API."
+
+#: billogram.php:413
+#: billogram.php:421
+#@ billogram-wc
+msgid "This field must not be empty!"
+msgstr "Du måste fylla i det här fältet!"
+
+#: billogram.php:416
+#@ billogram-wc
+msgid "API Password"
+msgstr "API lösenord"
+
+#: billogram.php:418
+#@ billogram-wc
+msgid "Your API password for Billogram API."
+msgstr "API lösenord för Billograms API."
+
+#: billogramAjax.php:54
+#@ billogram-wc
+msgid "Failed to create the invoice"
+msgstr "Misslyckades med att skapa fakturan"
+
+#: billogramAjax.php:55
+#: billogramAjax.php:64
+#@ billogram-wc
+msgid "Something went wrong, the invoice was not sent!"
+msgstr "Något gick fel, fakturan har inte skickats!"
+
+#: billogramAjax.php:60
+#@ billogram-wc
+msgid "Invoice sent"
+msgstr "Fakura skickad"
+
+#: billogramAjax.php:84
+#@ billogram-wc
+msgid "Order created!"
+msgstr "Order skapad!"
+
+#: billogramAjax.php:86
+#@ billogram-wc
+msgid "This order does not contain any subscriptions!"
+msgstr "Den här ordern behåller ingen prenumerationsprodukt!"
+
+#: billogramAjax.php:89
+#@ billogram-wc
+msgid "Woocommerce Subscriptions was not found!"
+msgstr "Woocommerce Subscriptions hittades inte!"
+
+#: billogramAjax.php:94
+#@ billogram-wc
+msgid "Something went wrong, the order was not created!"
+msgstr "Något gick fel, ordern skapades inte!"
+
+#: billogramUi.php:36
+#@ billogram-wc
+msgid "Billogram Invoice Actions"
+msgstr "Billogram Faktura Åtgärder"
+
+#: billogramUi.php:48
+#@ billogram-wc
+msgid "<h4>Invoice actions</h4>"
+msgstr "<h4>Faktura åtgärder</h4>"
+
+#: billogramUi.php:51
+#@ billogram-wc
+msgid "<h4>subscription actions</h4>"
+msgstr "<h4>Prenumerationsåtgärder</h4>"
+
+#: billogramUi.php:55
+#@ billogram-wc
+msgid "<p class='howto'><strong>You must use the original sbuscription order, in order to create a renewal order.</strong></p>"
+msgstr "<p class='howto'><strong>Du måste använda original ordern för att skapa en förnyelse order!</strong></p>"
+
+#: billogramUi.php:58
+#@ billogram-wc
+msgid "<p class='howto'><strong>NOTE!</strong> Only use this if you want to create a new renewal order!</p>"
+msgstr "<p class='howto'><strong>OBS!</strong> Använd bara det här om du vill skapa en ny förnyelseorder!</p>"
+
+#: billogramUi.php:80
+#@ billogram-wc
+msgid "Invoice status"
+msgstr "Faktura status"
+
+#: billogramUi.php:106
+#@ billogram-wc
+msgid "Not sent"
+msgstr "Inte skickad"
+
+#: billogramUi.php:110
+#@ billogram-wc
+msgid "Sent"
+msgstr "Skickad"
+
+#: billogramUi.php:114
+#@ billogram-wc
+msgid "Paid"
+msgstr "Betald"
+
+#: billogramUi.php:118
+#@ billogram-wc
+msgid "Partially paid"
+msgstr "Delvis betald"
+
+#: billogramUi.php:122
+#@ billogram-wc
+msgid "Expired"
+msgstr "Förfallen"
+
+#: billogramUi.php:126
+#@ billogram-wc
+msgid "Unknown status"
+msgstr "Okänd status"
+
+#: emails/billogramAwaitingApprovalEmail.php:23
+#: emails/billogramAwaitingApprovalEmail.php:29
+#: emails/billogramAwaitingApprovalEmail.php:30
+#@ billogram-wc
+msgid "Billogram Order received"
+msgstr "Billogram Orderbekräftelse"
+
+#: emails/billogramAwaitingApprovalEmail.php:26
+#@ billogram-wc
+msgid "Send a notification to the user that their order has been received"
+msgstr "Notifiera kunden att deras order har blivit mottagen"
+
+#: emails/billogramAwaitingApprovalEmail.php:131
+#@ billogram-wc
+msgid "Enable/Disable"
+msgstr "Aktivera/Deaktivera"
+
+#: emails/billogramAwaitingApprovalEmail.php:133
+#@ billogram-wc
+msgid "Enable this email notification"
+msgstr "Använd den här email notifikationen"
+
+#: emails/billogramAwaitingApprovalEmail.php:137
+#@ billogram-wc
+msgid "Subject"
+msgstr "Ämne"
+
+#: emails/billogramAwaitingApprovalEmail.php:139
+#, php-format
+#@ billogram-wc
+msgid "This controls the email subject line. Leave blank to use the default subject: <code>%s</code>."
+msgstr "Det här fältet kontrollerar vad som visas i ämnesraden på emailet. Lämna det här fältet blankt om du vill att använda standard värdet: <code>%s</code>."
+
+#: emails/billogramAwaitingApprovalEmail.php:141
+#: emails/billogramAwaitingApprovalEmail.php:148
+#@ billogram-wc
+msgid "Order received"
+msgstr "Orderbekräftelse"
+
+#: emails/billogramAwaitingApprovalEmail.php:144
+#@ billogram-wc
+msgid "Email Heading"
+msgstr "Email titel"
+
+#: emails/billogramAwaitingApprovalEmail.php:146
+#, php-format
+#@ billogram-wc
+msgid "This controls the main heading contained within the email notification. Leave blank to use the default heading: <code>%s</code>."
+msgstr "Det här fältet kontrollerar vad som visas som huvudtitel  i emailet. Lämna det här fältet blankt om du vill att använda standard värdet: <code>%s</code>."
+
+#: emails/billogramAwaitingApprovalEmail.php:151
+#@ billogram-wc
+msgid "Email type"
+msgstr "Email typ"
+
+#: emails/billogramAwaitingApprovalEmail.php:153
+#@ billogram-wc
+msgid "Choose which format of email to send."
+msgstr "Välj i vilket format du vill skicka emailet."
+
+#: emails/templates/emails/customer-processing-invoice.php:16
+#: emails/templates/emails/plain/customer-processing-invoice.php:13
+#@ billogram-wc
+msgid "Your order has now been received."
+msgstr "Din beställning har nu mottagits."
+
+#: emails/templates/emails/customer-processing-invoice.php:17
+#: emails/templates/emails/plain/customer-processing-invoice.php:14
+#@ billogram-wc
+msgid "The payment method you chose needs to be manually processed by us, we will continue to notify you about updates of your order."
+msgstr "Betalmetoden ni valt behövs behandlas av oss manuellt, vi kommer att fortsätta uppdatera dig kring statusen för ordern."
+
+#: emails/templates/emails/customer-processing-invoice.php:21
+#: emails/templates/emails/plain/customer-processing-invoice.php:15
+#@ billogram-wc
+msgid "Your order details are shown below for your reference:"
+msgstr "Detaljerna för er order kan ses nedanför:"
+
+#: emails/templates/emails/customer-processing-invoice.php:25
+#@ woocommerce
+msgid "Order:"
+msgstr ""
+
+#: emails/templates/emails/customer-processing-invoice.php:30
+#@ woocommerce
+msgid "Product"
+msgstr ""
+
+#: emails/templates/emails/customer-processing-invoice.php:31
+#@ woocommerce
+msgid "Quantity"
+msgstr ""
+
+#: emails/templates/emails/customer-processing-invoice.php:32
+#@ woocommerce
+msgid "Price"
+msgstr ""
+
+#: emails/templates/emails/customer-processing-invoice.php:58
+#@ woocommerce
+msgid "Customer details"
+msgstr ""
+
+#: emails/templates/emails/customer-processing-invoice.php:61
+#: emails/templates/emails/plain/customer-processing-invoice.php:43
+#@ woocommerce
+msgid "Email:"
+msgstr ""
+
+#: emails/templates/emails/customer-processing-invoice.php:64
+#: emails/templates/emails/plain/customer-processing-invoice.php:46
+#@ woocommerce
+msgid "Tel:"
+msgstr ""
+
+#: emails/templates/emails/plain/customer-processing-invoice.php:21
+#, php-format
+#@ woocommerce
+msgid "Order number: %s"
+msgstr ""
+
+#: emails/templates/emails/plain/customer-processing-invoice.php:22
+#, php-format
+#@ woocommerce
+msgid "Order date: %s"
+msgstr ""
+
+#: emails/templates/emails/plain/customer-processing-invoice.php:40
+#@ woocommerce
+msgid "Your details"
+msgstr ""
+
+#: billogram.php:390
+#@ billogram-wc
+msgid "Dispatch settings"
+msgstr "Faktura utskick"
+
+#: billogram.php:393
+#@ billogram-wc
+msgid "Choose whether you want to send invoices automatically or manually on orders."
+msgstr "Välj om fakturar ska skickas ut manuellt eller automatiskt."
+
+#: billogramStatus.php:12
+#@ billogram-wc
+msgid "Awaiting Approval"
+msgstr "Bekräfta Order"
+
+#: billogramStatus.php:17
+#, php-format
+#@ billogram-wc
+msgid "Awaiting Approval <span class=\"count\">(%s)</span>"
+msgid_plural "Awaiting Approval <span class=\"count\">(%s)</span>"
+msgstr[0] "Behöver Bekräftelse <span class=\"count\">(%s)</span>"
+msgstr[1] "Behöver Bekräftelse <span class=\"count\">(%s)</span>"
+
