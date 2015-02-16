@@ -98,6 +98,11 @@ class BillogramApiWrapper {
     * Define invoice data locally before creating the invoice
     */
     public function addItem($count = 1, $price = 0, $vat = 25, $title = 'Not defined') {
+        
+        
+        if (strlen($title) > 40)
+            $title = substr($title, 0, 37) . '...';
+        
         $item = array(
             'count' => $count,
             'price' => $price,
