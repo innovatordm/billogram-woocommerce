@@ -33,7 +33,7 @@ class BillogramAwaitingApprovalEmail extends WC_Email {
 	    $this->template_html  = 'emails/customer-processing-invoice.php';
 	    $this->template_plain = 'emails/plain/customer-processing-invoice.php';
 	 	$this->template_base  = plugin_dir_path(__FILE__) . 'templates/';
-	 	error_log('Email class');
+
 	 	add_action( 'woocommerce_order_status_pending_to_awaiting_approval_send',  array( $this, 'trigger' ), 10, 1 );
 	    
 	    WC_Email::__construct();

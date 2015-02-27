@@ -52,6 +52,7 @@ class BillogramAjax {
 					} catch (Exception $e) {
 						$order = wc_get_order($post->ID);
 						$order->update_status( 'failed', __( 'Failed to create the invoice', 'billogram-wc' ) );
+                        error_log(print_r($e, true));
 						echo __("Something went wrong, the invoice was not sent!", 'billogram-wc' );
 						wp_die();
 					}

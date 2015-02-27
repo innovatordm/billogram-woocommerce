@@ -42,23 +42,55 @@
 		}
 		public function orderMetaBox() {
 			global $post;
-			$order = wc_get_order($post->ID);
-			$items = $order->get_items();
-			$product = new WC_Product($item['product_id']);
-			$_tax = new WC_Tax();
-			
-
-			foreach ($items as $item) {
-				
+            
+            /* test */
+             
+        
+           $order = wc_get_order($post->ID);
+        $items = $order->get_items();
+            
+           foreach ($items as $item) {
+				$product = new WC_Product($item['product_id']);
+				$_tax = new WC_Tax();
 				$tax_rates  = $_tax->get_shop_base_rate( $product->tax_class );
-				$taxes      = $_tax->calc_tax( $price, $tax_rates, true );
-				$tax_amount = $_tax->get_tax_total( $taxes );
-				$price      = round( $price - $tax_amount, 2);
-				echo "<pre>";
-				var_dump((int) $tax_rates[1]['rate']);
-				echo "</pre>";
+
+               
+               
+                $lineTaxRate = (!empty($item['line_tax']) && intval($item['line_tax']) > 0 && !empty($item['line_total']) && intval($item['line_total']) > 0) ? intval(($item['line_tax']  / $item['line_total']) * 100 ) : 0;
+
+               
+				var_dump(array(
+					$item['qty'],
+					round(floatval($item['line_total']), 2),
+					$lineTaxRate, // Tax
+					$item['name']
+				));
 			}
-			
+            
+            
+            
+            var_dump(sprintf("%s - %s", $order->get_shipping_tax() , $order->order_shipping));
+            
+            // Calculate shipping rate
+            $shippingTaxRate = ($order->get_shipping_tax() > 0) ? intval(($order->get_shipping_tax()  / $order->order_shipping) * 100 ) : 0;
+            
+             
+            // Add fees
+            foreach ($order->get_fees() as $item ) {
+  // Calculate shipping rate
+                $feeTaxRate = (!empty($item['line_tax']) && intval($item['line_tax']) > 0 && !empty($item['line_total']) && intval($item['line_total']) > 0) ? intval(($item['line_tax']  / $item['line_total']) * 100 ) : 0;
+
+                // Add shipping cost
+                var_dump(array(
+                    1,
+                    $item['line_total'],
+                    $feeTaxRate,
+                    $item['name']
+                ));
+            
+            }
+            /* end test */
+            
 
 			$invoice_status = get_post_meta($post->ID, '_billogram_status', true);
 			$required = ($invoice_status === '' || $invoice_status === 'Unattested') ? '' : 'disabled';
