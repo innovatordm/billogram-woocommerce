@@ -56,7 +56,7 @@
 
                
                
-                $lineTaxRate = (!empty($item['line_tax']) && intval($item['line_tax']) > 0 && !empty($item['line_total']) && intval($item['line_total']) > 0) ? intval(($item['line_tax']  / $item['line_total']) * 100 ) : 0;
+                $lineTaxRate = (!empty($item['line_tax']) && intval($item['line_tax']) > 0 && !empty($item['line_total']) && intval($item['line_total']) > 0) ? intval(round(($item['line_tax']  / $item['line_total']) * 100 )) : 0;
 
                
 				var_dump(array(
@@ -70,15 +70,15 @@
             
             
             var_dump(sprintf("%s - %s", $order->get_shipping_tax() , $order->order_shipping));
-            
+                        
             // Calculate shipping rate
-            $shippingTaxRate = ($order->get_shipping_tax() > 0) ? intval(($order->get_shipping_tax()  / $order->order_shipping) * 100 ) : 0;
-            
+             $shippingTaxRate = ($order->get_shipping_tax() > 0) ? intval((round($order->get_shipping_tax()  / $order->order_shipping)) * 100 ) : 0;
+
              
             // Add fees
             foreach ($order->get_fees() as $item ) {
   // Calculate shipping rate
-                $feeTaxRate = (!empty($item['line_tax']) && intval($item['line_tax']) > 0 && !empty($item['line_total']) && intval($item['line_total']) > 0) ? intval(($item['line_tax']  / $item['line_total']) * 100 ) : 0;
+                $feeTaxRate = (!empty($item['line_tax']) && intval($item['line_tax']) > 0 && !empty($item['line_total']) && intval($item['line_total']) > 0) ? intval((round($item['line_tax']  / $item['line_total']) * 100 )) : 0;
 
                 // Add shipping cost
                 var_dump(array(
