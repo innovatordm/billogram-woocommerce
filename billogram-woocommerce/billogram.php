@@ -177,10 +177,14 @@ function BillogramWCInit() {
 			// Add items to invoice
 			$items = $order->get_items();
 			foreach ($items as $item) {
+				$product = new WC_Product($item['product_id']);
+				$_tax = new WC_Tax();
+				$tax_rates  = $_tax->get_shop_base_rate( $product->tax_class );
+
 				$bill->addItem(
 					$item['qty'],
-					($item['line_total'] / $item['qty']),
-					(int) (($item['line_tax'] / $item['line_total'])*100), // Tax
+					$product->get_price_excluding_tax(),
+					(int) $tax_rates[1]['rate'], // Tax
 					$item['name']
 				);
 			}
