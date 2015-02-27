@@ -42,6 +42,23 @@
 		}
 		public function orderMetaBox() {
 			global $post;
+			$order = wc_get_order($post->ID);
+			$items = $order->get_items();
+			$product = new WC_Product($item['product_id']);
+			$_tax = new WC_Tax();
+			
+
+			foreach ($items as $item) {
+				
+				$tax_rates  = $_tax->get_shop_base_rate( $product->tax_class );
+				$taxes      = $_tax->calc_tax( $price, $tax_rates, true );
+				$tax_amount = $_tax->get_tax_total( $taxes );
+				$price      = round( $price - $tax_amount, 2);
+				echo "<pre>";
+				var_dump((int) $tax_rates[1]['rate']);
+				echo "</pre>";
+			}
+			
 
 			$invoice_status = get_post_meta($post->ID, '_billogram_status', true);
 			$required = ($invoice_status === '' || $invoice_status === 'Unattested') ? '' : 'disabled';
