@@ -236,7 +236,7 @@ function BillogramWCInit() {
 			// Key to sign callback
 			$key = md5(uniqid("", true) . $order->id);
 			// Generated callback url
-			$callbackUrl = str_replace( 'https:', 'http:', add_query_arg( 'wc-api', 'BillogramWC', home_url( '/' ) ) );
+			$callbackUrl = add_query_arg( 'wc-api', 'BillogramWC', home_url( '/' ));
 			// Save sign key to order info
 			update_post_meta($order->id, '_billogram_sign_key', $key);
 
