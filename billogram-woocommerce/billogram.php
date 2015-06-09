@@ -108,6 +108,7 @@ function BillogramWCInit() {
 			// Mark as on-hold (we're awaiting the manual invoice)
 			$order = wc_get_order( $order_id );
 
+            /*
 			try {
 				$this->createInvoiceOrder($order_id);
 			} catch (Exception $e) {
@@ -119,6 +120,7 @@ function BillogramWCInit() {
 					'redirect'	=> $this->get_return_url( $order )
 				);
 			}
+            */
 			do_action('woocommerce_order_status_pending_to_awaiting_approval', $order_id);
 			// Set to on-hold for invoice approval
 			$order->update_status( 'wc-awaiting-approval', __( 'Waiting for order approval.', 'billogram-wc' ) );
@@ -181,21 +183,54 @@ function BillogramWCInit() {
 				$_tax = new WC_Tax();
 				$tax_rates  = $_tax->get_shop_base_rate( $product->tax_class );
 
+                $lineTaxRate = (!empty($item['line_tax']) && intval($item['line_tax']) > 0 && !empty($item['line_total']) && intval($item['line_total']) > 0) ? intval(round(($item['line_tax']  / $item['line_total']) * 100) ) : 0;
+
+             
+                
 				$bill->addItem(
 					$item['qty'],
-					$product->get_price_excluding_tax(),
-					(int) $tax_rates[1]['rate'], // Tax
+					round(floatval($item['line_total']), 2),
+					$lineTaxRate, // Tax
 					$item['name']
 				);
 			}
-			// Add shipping cost
-			$bill->addItem(
-				1,
-				$order->order_shipping,
-				25,
-				$order->get_shipping_method()
-			);
-			
+            
+                    
+            if(!empty($order->order_shipping) && intval($order->order_shipping) > 0)
+            {
+
+
+                // Calculate shipping rate
+                 $shippingTaxRate = ($order->get_shipping_tax() > 0) ? intval(round(($order->get_shipping_tax()  / $order->order_shipping) * 100 )) : 0;
+
+                // Add shipping cost
+                $bill->addItem(
+                    1,
+                    round(floatval($order->order_shipping), 2),
+                    $shippingTaxRate,
+                    $order->get_shipping_method()
+                );
+
+            }
+
+            
+            // Add fees
+            foreach ($order->get_fees() as $item ) {
+                
+            
+                // Calculate shipping rate
+                $feeTaxRate = (!empty($item['line_tax']) && intval($item['line_tax']) > 0 && !empty($item['line_total']) && intval($item['line_total']) > 0) ? intval(round(($item['line_tax']  / $item['line_total']) * 100 )) : 0;
+
+                // Add shipping cost
+                $bill->addItem(
+                    1,
+                    round(floatval($item['line_total']), 2),
+                    $feeTaxRate,
+                    $item['name']
+                );
+                
+            }
+            
 			$current = date("Y-m-d");
 			$due = date("Y-m-d", strtotime("+14 day"));
 			// Key to sign callback

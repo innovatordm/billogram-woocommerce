@@ -304,6 +304,8 @@ class Api
     {
         $url = $this->apiBase . '/' . $objectUrl;
 
+        error_log(print_r($data, true));
+        
         return $this->checkApiResponse(
             $this->httpRequest(
                 $url,
